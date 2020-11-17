@@ -172,9 +172,6 @@ if __name__ == "__main__":
   ```
 
 
-## 数据库
-
-* [Ubuntu Linux 上安装和使用开源数据库 PostgreSQL](https://linux.cn/article-11480-1.html) <https://www.jianshu.com/p/f23ae3798fde>
 
 # linux
 
@@ -205,7 +202,101 @@ if __name__ == "__main__":
 
 * [python的C与C++扩展编程:Cython和pybind11](https://zhuanlan.zhihu.com/p/49737946)
 
-* 
+
+# 指令
+
+* 打开labelImg图片标注工具
+
+  ```bash
+  cd ~/Desktop/labelImg
+  python labelImg.py
+  ```
+
+* 打开datagrip(已建立软链接)
+
+   ```bash
+  datagrip
+   ```
+
+# 数据库
+
+* 资料
+
+  [Ubuntu Linux 上安装和使用开源数据库 PostgreSQL](https://linux.cn/article-11480-1.html) <https://www.jianshu.com/p/f23ae3798fde>
+
+* postgresql
+
+  * 切换为linux用户postgres
+
+    ```bash
+    sudo su postgres
+    ```
+
+  * 切换回linux用户kai
+
+    ```bash
+    su kai
+    ```
+
+  * 以postgres登录数据库
+
+    ```bash
+    psql
+    ```
+
+  * postgresql常用指令
+
+    ```bash
+    #退出
+    \q
+    #查看所有用户
+    \du
+    #查看所有数据库
+    \l
+    ```
+
+  * 创建新用户dbuser并设置密码
+
+    ```bash
+    CREATE USER dbuser WITH PASSWORD 'password';
+    #赋予用户超级用户权限
+    ALTER USER dbuser WITH SUPERUSER;
+    #创建数据库
+    CREATE DATABASE exampledb OWNER dbuser;
+    #赋予数据库操作权限
+    GRANT ALL PRIVILEGES ON DATABASE exampledb to dbuser;
+    ```
+
+  * 删除用户
+
+    ```bash
+    DROP USER my_user;
+    ```
+
+  * 切换用户
+
+    ```bash
+    psql -U dbuser;
+    ```
+
+  * 改密码
+
+  ```bash
+  ALTER USER postgres WITH PASSWORD 'zhangkai';
+  ```
+
+  * 以linux用户kai直接登录数据库（kai是superuser）
+
+    ```bash
+    #登录数据库postgres
+    psql -U kai -d postgres
+    #登录数据库exampledb
+    psql -U kai -d exampledb
+    #让我想不通的是，postgresql用户dbuser没有超级用户权限，竟然也可以登录postgres数据库
+    psql -U dbuser -d postgres
+    ```
+
+    
 
 # 知识储备
 
@@ -215,6 +306,28 @@ if __name__ == "__main__":
 * [指针与引用](https://www.cnblogs.com/pythonista/p/11178705.html)
 * [为什么我们需要制品管理](https://xie.infoq.cn/article/f5f72e8a25f5b6581c0a2fb66)
 * [APNs推送机制](https://www.jianshu.com/p/958ca3fd3cef)
+* [交叉编译详解](https://blog.csdn.net/pengfei240/article/details/52912833)
+* [正向代理和反向代理的区别](https://cloud.tencent.com/developer/article/1418457)
+  * 正向代理和反向代理都架设在客户和服务器之间，提供缓存，提高访问速度
+  * 正向代理为客户服务，可以访问一些受限制的资源；客户知道目标服务器的IP，但目标服务器不知道客户的IP
+  * 反向代理为服务器服务，可以提供负载均衡和安全访问；此时，客户并不知道目标服务器的IP
 
 # 临时记录
 
+* 安装ncnn依赖<https://github.com/Tencent/ncnn/wiki/how-to-build#build-for-linux>
+
+  ```bash
+  sudo apt install build-essential git cmake libprotobuf-dev protobuf-compiler libvulkan-dev vulkan-utils libopencv-dev
+  ```
+
+* build ncnn
+
+  ```bash
+  $ cd ncnn
+  $ mkdir -p build
+  $ cd build
+  build$ cmake -DCMAKE_BUILD_TYPE=Release -DNCNN_VULKAN=ON -DNCNN_SYSTEM_GLSLANG=ON -DNCNN_BUILD_EXAMPLES=ON ..
+  build$ make -j$(nproc)
+  ```
+
+  
