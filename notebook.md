@@ -1,8 +1,6 @@
 
 
-# Python\
-
-
+# Python
 
 * 从一个文件夹中逐个读取文件名：
 
@@ -280,10 +278,22 @@ if __name__ == "__main__":
 * 注意事项
 
   * `go mod`中的`module bi-relay-statistics`似乎指定了项目的根目录。如果要使用本地的package需要更改
-  * import必须添加包时必须以上述`module+package`形式导入。不能只添加包名
+  * import添加包时必须以上述`module+package`形式导入。不能只添加包名
   * 同一个package内的函数互相引用，不需要加package.func_name
+  * `强制`package内的函数、结构体如果被外部使用，则需要将函数名、结构体名首字母大写
+  * `规范`package内的函数、结构体如果没有被外部使用（局部使用），则需要将函数名、结构体名首字母小写，如果是单词拼写，则用大写分割，如`getDeviceId`；package名都小写，如果是单词拼写，则使用下划线分割
+  * 对外暴露的函数、结构体（即首字母大写的函数等）写注释时，需要遵从这样的规范`//函数名 注释`
+  * 
   
 * [闭包示例——较烧脑](https://segmentfault.com/a/1190000018689134)
+
+* [panic](https://blog.csdn.net/netdxy/article/details/71339115)
+
+* [channel](https://www.jianshu.com/p/24ede9e90490)
+
+* 声明和初始化的区别
+
+  * golang中，slice、map、channel、指针类型声明后需要使用make初始化；其余类型声明即初始化
 
 # linux
 
@@ -375,6 +385,13 @@ if __name__ == "__main__":
   ctrl+shift+N
   ```
 
+* datagrep快捷键
+
+  ```bash
+  #搜索
+  Ctrl+shift+F
+  ```
+
   
 
 # 工具
@@ -385,9 +402,15 @@ if __name__ == "__main__":
 
 * [typora](https://sspai.com/post/54912)
 
+* [typora画图](https://zhuanlan.zhihu.com/p/172635547)
+
+  * https://www.cnblogs.com/codeclock/p/13634272.html
+  * https://www.jianshu.com/p/7ddbb7dc8fec
+  * https://cloud.tencent.com/developer/article/1334691
+
 * [python的C与C++扩展编程:Cython和pybind11](https://zhuanlan.zhihu.com/p/49737946)
 
-* [datagrep使用指南](https://www.jb51.net/softjc/666676.html)
+* [datagrip使用指南](https://www.jb51.net/softjc/666676.html)
 
 * [画图](https://mermaid-js.github.io/mermaid/#/)
 
@@ -480,7 +503,8 @@ if __name__ == "__main__":
   ```
 
 
-* 
+* [sed](https://coolshell.cn/articles/9104.html)
+* [awk](https://coolshell.cn/articles/9070.html)
 
 # 指令
 
@@ -577,6 +601,10 @@ git log
 # 操作系统
 
 * [堆和栈的区别](https://blog.csdn.net/hairetz/article/details/4141043)
+* 进程和线程
+  * 进程是操作系统分配资源的单位
+  * 线程是CPU调度和分配的最小单位；多个线程共享进程内的地址空间；线程独立拥有自己的堆栈和局部变量
+  * 线程可以在用户态实现，也可以在内核态实现
 
 # 数据库
 
@@ -986,7 +1014,193 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
           
   ```
 
+
+# 工作
+
+* data_warehouse
+  * 每日定时执行begin_daily_merge，参数中包含分支节点信息和时间信息
+  * 主要步骤包括：import和merge，此外还有clean等
+  * import步骤：中心节点branch表中包含了各分支节点的账号密码等信息，中心节点通过dblink函数连接各分支节点，并在分支节点执行import操作。该操作主要从日志中的.csv 文件导入分支节点相应的表
+  * merge步骤：函数以init_开头，通过dblink用SQL语句操作分支节点，这些语句的特点是广泛应用了group，count等操作
+  * 中心节点每日执行定时任务，执行成功与否记录在表task_status，1代表正在执行，2代表完成。还记录了开始时间，结束时间，节点号
   
+  ```mermaid
+  graph TD;
+      A(begin_daily_merge)-->|"先执行"|B(daily_import_data);
+      A(begin_daily_merge)-->|"再执行"|C(daily_merge);
+      A(begin_daily_merge)-->|"最后执行"|D(daily_clean);
+      B-->|"dblink连接分支节点"|E(start_import);
+      E-->F(update_basic_dict);
+      E-->G(import_active_consumer);
+      E-->Z(...);
+  %%    E-->H(import_active_device);
+  %%    E-->I(import_bucket_storage_analysis);
+  %%    E-->J(import_bucket_cloud_service);
+  %%    E-->K(import_relay_log);
+  %%    E-->L(import_page_view);
+  %%    E-->M(import_vas_bi_event);
+      
+      C-->N(init_operation);
+      C-->O(init_form);
+      C-->P(init_subscribe);
+      C-->Y(...);
+  %%    C-->Q(init_consumer);
+  %%    C-->R(init_device);
+  %%    C-->S(init_state);
+  %%    C-->T(init_retention);
+      C-->U(init_active_consumer);
+  %%    C-->V(init_active_device);
+  %%    C-->W(init_storage);
+  %%    C-->X(init_relay);
+      
+      U-->1(init_active_device_daily_summary);
+      U-->2(init_active_device_7_day_summary);
+      U-->999(...);
+  %%    U-->3(init_active_device_30_day_summary);
+  %%    U-->4(init_active_device_over_1_week_in_30_day_summary);
+  %%    U-->5(init_active_device_over_2_week_in_30_day_summary);
+  %%    U-->6(init_active_device_over_4_week_in_30_day_summary);
+      
+      1-->|"dblink连接分支节点"|a(table:active_device);
+      1-->|"dblink连接分支节点"|b(table:ip_location);
+      1-->|"dblink连接分支节点"|c(table:device);
+      
+  ```
+  
+  
+  
+  ```plsql
+  ├── branch
+  │   ├── biz
+  │   │   ├── biz
+  │   │   │   ├── function
+  │   │   │   │   ├── build_state
+  │   │   │   │   │   └── build_state.sql
+  │   │   │   │   └── load_data
+  │   │   │   │       ├── load_active_consumer.sql
+  │   │   │   │       ├── load_active_device.sql
+  │   │   │   │       ├── load_bucket_cloud_service.sql
+  │   │   │   │       ├── load_bucket_storage_analysis.sql
+  │   │   │   │       ├── load_page_view.sql
+  │   │   │   │       ├── load_relay_info.sql
+  │   │   │   │       ├── load_vas_bi_event.sql
+  │   │   │   │       └── start_load.sql
+  │   │   │   └── table
+  │   │   │       ├── basic.sql
+  │   │   │       ├── online_device.sql
+  │   │   │       ├── origin_data.sql
+  │   │   │       └── state.sql
+  │   │   └── dict
+  │   │       ├── extension.sql
+  │   │       ├── foreign_table.sql
+  │   │       ├── function.sql
+  │   │       └── table.sql
+  │   └── operations
+  │       ├── makeup
+  │       │   ├── backup.sql
+  │       │   ├── ip_location.sql
+  │       │   └── sync.sql
+  │       └── tools
+  │           └── tools.sql
+  ├── center
+  │   ├── biz
+  │   │   ├── bill
+  │   │   │   ├── calculate.sql
+  │   │   │   ├── load.sql
+  │   │   │   └── month-bill.sql
+  │   │   ├── dict
+  │   │   │   ├── dict_table.sql
+  │   │   │   ├── extension.sql
+  │   │   │   └── function.sql
+  │   │   ├── operation
+  │   │   │   ├── calculate.sql
+  │   │   │   └── table.sql
+  │   │   ├── other
+  │   │   │   ├── function
+  │   │   │   │   ├── active.sql
+  │   │   │   │   ├── consumer.sql
+  │   │   │   │   ├── device.sql
+  │   │   │   │   ├── form_monthly.sql
+  │   │   │   │   ├── form.sql
+  │   │   │   │   ├── form_weekly.sql
+  │   │   │   │   ├── retention_monthly.sql
+  │   │   │   │   ├── retention.sql
+  │   │   │   │   ├── retention_weekly.sql
+  │   │   │   │   ├── state.sql
+  │   │   │   │   └── subscribe.sql
+  │   │   │   └── table
+  │   │   │       ├── active.sql
+  │   │   │       ├── consumer.sql
+  │   │   │       ├── device.sql
+  │   │   │       ├── form_retention.sql
+  │   │   │       ├── form.sql
+  │   │   │       ├── retention.sql
+  │   │   │       ├── state.sql
+  │   │   │       └── subscribe.sql
+  │   │   ├── relay
+  │   │   │   ├── function
+  │   │   │   │   ├── relay_daily.sql
+  │   │   │   │   ├── relay_monthly.sql
+  │   │   │   │   └── relay_weekly.sql
+  │   │   │   └── table
+  │   │   │       ├── relay_daily.sql
+  │   │   │       ├── relay_monthly.sql
+  │   │   │       └── relay_weekly.sql
+  │   │   └── storage
+  │   │       ├── function
+  │   │       │   └── storage_daily.sql
+  │   │       └── table
+  │   │           └── storage_daily.sql
+  │   └── operations
+  │       ├── alarm
+  │       │   └── alarm.sql
+  │       ├── makeup
+  │       │   └── center.sql
+  │       ├── timer
+  │       │   ├── daily_start.sql								#每日定时任务，由此开启
+  │       │   ├── monthly_start.sql
+  │       │   └── weekly_start.sql
+  │       └── tools
+  │           └── tools.sql
+  ├── doc
+  │   └── 部署文档.md
+  ├── online-query
+  │   └── order-statistics.sql
+  ├── README.md
+  └── test.sql
+  
+  ```
+  
+  
+  
+* bi-relay-statistics
+  * main.go文件中base.Start进入主要部分
+  * consumer.go文件最重要的两个函数it.write和it.consume，先执行前者，后执行后者，但阅读代码应当先读后者
+  * it.consume中，在管道consumeChan中经解析parse等得到除UserClientCode，UserCompanyCode，DeviceProductCode，DeviceCompanyCode这四个字段外的所有数据
+  * it.write中，从管道consumeChan中读取数据到buffer，并通过查询postgresql数据库（代码中体现为package psql）得到四个字段对应的值（以前通过查询线上数据库，使用package dorm），将完善后的数据写入 /media/efs/dana/dbd/bi-binlog/logstore，后续供data_warehouse读取
+  *  /media/efs/dana/dbd/bi-relay-statistics/logs是go代码执行产生的日志文件，/media/efs/dana/dbd/bi-relay-statistics/logstore是go代码的目标输出
+  *  /media/efs/dana/dbd/bi-relay-statistics/timer.sh定时将/media/efs/dana/dbd/bi-relay-statistics/logstore中昨天的文件复制到/opt/oss/logstore/relay-connection-information，并将/media/efs/dana/dbd/bi-relay-statistics/logstore目录下15天前的数据删除
+
+* bi-binlog
+
+  * 程序理解流图
+
+  ```mermaid
+  graph TD;
+      A(begin_daily_merge)-->|"先执行"|B(daily_import_data);
+  ```
+
+* 分支节点各表含义
+
+  * 
+
+  ```plsql
+  consumer_code.code=active_consumer.code
+  ```
+
+* 业务理解
+
+  * 云平台成本：带宽（relay）、存储（bucket）、人脸识别算法和算力（faceR，按照调用次数收费）
 
 # 计算机网络
 
@@ -1100,8 +1314,7 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
     6. 新建tag
     7. CI
     8. 在harbor中查看
-
-  * 在helm charts中添加该业务程序的配置文件
+* 在helm charts中添加该业务程序的配置文件
     1. git clone helm charts的业务仓库
     2. 新建业务代码目录，如idgen.idgen-pvt-svr
     3. 将@wangkaixiong等人已经做好的配置文件（idgen.iris-wid-pvt-svr/ks-charts-sit-a998-alibj和idgen.iris-wid-pvt-svr/ks-charts-sit-a999-alibj）复制到该目录
@@ -1114,6 +1327,11 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
     10. merge
     11. CI
   * kubesphere部署（998和999分别部署）
+  * ECS、OSS、RDS、Redis区别
+    * ECS用来跑程序，如bi-binlog
+    * OSS存储大量文件
+    * RDS放mySQL数据库
+    * Redis放NoSQL非关系数据库
 
 # 算法
 
@@ -1219,39 +1437,97 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
 
 # 临时记录
 
-```go
-//zhangkai try
-/*
-func GetDeviceInfo(deviceIDArr []string) (infos map[string]*DeviceInfo, err error) {
-	infos = make(map[string]*DeviceInfo, 0)
-	//where语句应该放在哪里,使用in还是where
-	//DeviceId, DeviceId, ProductCode需不需要改为device_id
-	Sql.SQL("select device_code.code DeviceId, basic_dict_company_all.core_code CompanyCode, basic_dict_product_all.product_code ProductCode from device_code t1 left join basic_video_device_uid t2 on t1.uid=t2.device_id left join basic_dict_product_all t3 on t2.product_id=t3.id left join basic_dict_company_all t4 on t3.company_id=t4.id").Find(&infos)
-	err = DanaSyncDb.In("device_id", deviceIDArr).Find(&devices)
-	if err != nil {
-		logx.X.Error(err)
-		return
-	}
+* [channel](https://colobu.com/2016/04/14/Golang-Channels/)（https://blog.csdn.net/sureSand/article/details/79633926）
 
-	for _, it := range infos {
-		var productCode, coreCode string
-		productCode, coreCode, err = GetProductInfo(it.ProductId)
-		if err != nil {
-			logx.X.Error(err)
-			return
-		}
-		infos[it.DeviceId] = &DeviceInfo{
-			DeviceId:    it.DeviceId,
-			CompanyCode: coreCode,
-			ProductCode: productCode,
-		}
-	}
-	return
-}
-*/
+```plsql
+create table if not exists payment_device_summary
+(
+    date         date    not null, --日期
+    node_id      integer not null, --节点编号
+    company_id   integer not null, --公司数字编号
+    product_id   integer not null, --产品数字编号
+    country_code char(2),          --国家代码
+    city_name    varchar(80),      --城市名
+    coordinates  point,            --位置
+    amount       integer not null  -- 新增付费设备数量
+);
 
+select (time_bucket(''1d'', cache_payment_device.time))::date date,
+                    ' || node_id || ',
+                    device.company_id,
+                    product_id,
+                    country_code,
+                    city_name,
+                    point(min(coordinates[0]), min(coordinates[1])),
+                    count(*)
+                from cache_payment_device left join device on cache_payment_device.id = device.id left join consumer on consumer.id = consumer_id left join ip_location on range @> inet_to_box(ip)
+                where cache_payment_device.time >= ''' || start_date || '+00''
+                and cache_payment_device.time < ''' || end_date + 1 || '+00''
+                and device.company_id is not null
+                group by 1, 3, 4, 5, 6
+                order by 1, 3, 4, 5 ,6
+
+create table if not exists cache_payment_device
+(
+    id          bigint primary key,   --设备数字编号
+    time        timestamptz not null, --初次付费时间
+    consumer_id bigint                --用户数字编号
+);
+
+create table if not exists device
+(
+    id          bigint primary key, --设备数字编号
+    company_id  integer not null,   --公司数字编号
+    product_id  integer not null,   --产品数字编号
+    device_type integer not null    --设备类型, 60000,60001,60002,60003,60004,60005
+) partition by hash ( id );
+
+create table if not exists consumer
+(
+    id            bigint primary key,   --用户数字编号
+    company_id    integer     not null, --公司数字编号
+    client_id     integer     not null, --客户端数字编号
+    time          timestamptz not null, --用户注册的时间
+    ip            inet,                 --注册时ip地址
+    register_type smallint    not null  --注册类型, 0表示平台接口注册, 1表示邮箱,2表示手机,3表示Oauth注册
+) partition by hash (id);
+
+create table if not exists ip_location
+(
+    range        box not null, --ip范围
+    country_code char(2),      --国家2位代码
+    city_name    varchar(80),  --英文城市名
+    coordinates  point         --城市坐标
+);
+
+create table if not exists form
+(
+    time                  timestamptz not null, --收款/退款/已取消/付款失败时间
+    order_id              bigint      not null, --订单数字编号
+    consumer_id           bigint,               --用户数字编号
+    device_id             bigint,               --设备数字编号
+    service_id            smallint    not null, --服务数字编号
+    service_duration      smallint    not null, --时长,0表示永久
+    renewal               boolean     not null, --是否是续费订单
+    renewal_type          smallint    not null, --add续费类型，1订阅自动续费，2用户手动续费, 3没有上一单
+    currency              char(3)     not null, --货币代码
+    pay_channel_id        smallint    not null, --支付通道数字编号
+    form_type             smallint    not null, --1收款, 2退款, 3已取消, 4付款失败, 5创建订单
+    commission            numeric     not null, --手续费
+    amount                numeric     not null, --金额
+    free_form_create_type smallint    not null, --1手动开通，2兑换码，3免费赠送,4付费订单
+    pre_order_type        smallint    not null  --1没有上一单,2付费,3免费
+);
+
+    truncate cache_payment_device;
+    insert into cache_payment_device
+    select device_id, time, consumer_id
+    from form
+    where form_type = 1
+      and device_id is not null
+      and amount > 0
+      and time < target + 1
+    order by 2
+    on conflict do nothing;
 ```
-
-
-
 
