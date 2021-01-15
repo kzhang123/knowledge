@@ -291,9 +291,103 @@ if __name__ == "__main__":
 
 * [channel](https://www.jianshu.com/p/24ede9e90490)
 
+  * https://segmentfault.com/a/1190000017958702
+  * https://blog.csdn.net/paladinosment/article/details/42243303
+
 * 声明和初始化的区别
 
   * golang中，slice、map、channel、指针类型声明后需要使用make初始化；其余类型声明即初始化
+  
+* 编程踩坑
+
+  * len(管道)会随时变化
+
+    ```go
+    package main
+    
+    import (
+    	"fmt"
+    )
+    
+    func main() {
+    	chankai:=make(chan int, 5)
+    	chankai<-1
+    	chankai<-2
+    	chankai<-3
+    	for i := 0;i<len(chankai);i++{		//len(chankai)一直变化
+    		fmt.Println(<-chankai)
+    	}
+    }
+    //输出为1 2
+    //没有3
+    ```
+
+  * 指针
+
+    ```go
+    package main
+    
+    import "fmt"
+    //使用st1和st2取结构体内的值，效果一样，即st1.c和st2.c没有差别
+    func main() {
+    	type st struct {
+    		a1 int
+    		a2 []int
+    		b string
+    		c map[string]int
+    	}
+    	st1:=st{
+    		a1: 1,
+    		b: "good",
+    		c:make(map[string]int),
+    	}
+    	st1.a2=append(st1.a2,1,2,3)
+    	st1.c["xiaoming"]=10
+    	st1.c["xiaohua"]=11
+    	st2:=&st1
+    	st2.a1=99
+    	fmt.Println(st1)
+    	fmt.Println(st2)
+    }
+    //输出结果：{99 [1 2 3] good map[xiaohua:11 xiaoming:10]}
+    //        &{99 [1 2 3] good map[xiaohua:11 xiaoming:10]}
+    ```
+
+  * 并发
+
+    ```go
+    package main
+    
+    import (
+     "fmt"
+     "sync"
+    )
+    
+    func main() {
+    var m int64 = 0
+    
+    var wg sync.WaitGroup  //主线程执行完以后，不会等协程，程序就会退出。因此需要这个变量等协程执行完
+    go func() {
+      wg.Add(1)
+      for i := 0; i < 10000000000 ; i++ {
+       m++
+      }
+      wg.Done()
+     }()
+    
+     for i := 0; i < 10000000000 ; i++ {
+      m++
+     }
+    
+     wg.Wait()
+     fmt.Println(m)
+    
+    }
+    //输出为：10026230153 
+    //or 10029343835
+    ```
+
+    预期输出为20000000000。可见，并发冲突很严重
 
 # linux
 
@@ -385,13 +479,24 @@ if __name__ == "__main__":
   ctrl+shift+N
   ```
 
-* datagrep快捷键
+* datagrip快捷键
 
   ```bash
   #搜索
   Ctrl+shift+F
   ```
 
+* goland快捷键
+
+  ```bash
+  #整理代码
+  Ctrl+alt+L
+  #返回上一级代码
+  alt+左
+  #跳转到函数调用处
+Ctrl+B
+  ```
+  
   
 
 # 工具
@@ -1531,3 +1636,17 @@ create table if not exists form
     on conflict do nothing;
 ```
 
+https://www.cnblogs.com/liang1101/p/7285955.html
+
+https://blog.csdn.net/fly910905/article/details/104360402
+
+* ```javascript
+  https://b.com/oauth/token?
+   client_id=CLIENT_ID&
+   client_secret=CLIENT_SECRET&
+   grant_type=authorization_code&
+   code=AUTHORIZATION_CODE&
+   redirect_uri=CALLBACK_URL
+  域名、http请求post、URL参数
+  请求内容放在post和网址里有什么区别
+  ```
