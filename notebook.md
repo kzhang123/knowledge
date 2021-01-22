@@ -283,7 +283,7 @@ if __name__ == "__main__":
   * `强制`package内的函数、结构体如果被外部使用，则需要将函数名、结构体名首字母大写
   * `规范`package内的函数、结构体如果没有被外部使用（局部使用），则需要将函数名、结构体名首字母小写，如果是单词拼写，则用大写分割，如`getDeviceId`；package名都小写，如果是单词拼写，则使用下划线分割
   * 对外暴露的函数、结构体（即首字母大写的函数等）写注释时，需要遵从这样的规范`//函数名 注释`
-  * 
+  * 定义结构体方法时，可以传值，也可以传指针，后者可以改变变量的值
   
 * [闭包示例——较烧脑](https://segmentfault.com/a/1190000018689134)
 
@@ -293,6 +293,11 @@ if __name__ == "__main__":
 
   * https://segmentfault.com/a/1190000017958702
   * https://blog.csdn.net/paladinosment/article/details/42243303
+  * https://www.cnblogs.com/liang1101/p/7285955.html
+  * https://blog.csdn.net/sureSand/article/details/79633926
+  * 无缓存channel必须在两个协程里使用（或者main和一个协程），如果仅在main函数中使用，只写不读，将会阻塞
+
+* [结构体][https://blog.csdn.net/fly910905/article/details/104360402]
 
 * 声明和初始化的区别
 
@@ -484,6 +489,8 @@ if __name__ == "__main__":
   ```bash
   #搜索
   Ctrl+shift+F
+  #查找引用，快速找到所有在符号处引用该符号的代码，无论该符号是类，方法，字段，参数还是其他语句的一部分。
+  Alt + Shift + 7
   ```
 
 * goland快捷键
@@ -517,7 +524,9 @@ Ctrl+B
 
 * [datagrip使用指南](https://www.jb51.net/softjc/666676.html)
 
-* [画图](https://mermaid-js.github.io/mermaid/#/)
+* [markdown画图](https://mermaid-js.github.io/mermaid/#/)
+
+* [谷歌安装器](https://xiaomifirmware.com/downloads/download-google-installer-3-0-xiaomi/)
 
 * conda使用
 
@@ -706,10 +715,15 @@ git log
 # 操作系统
 
 * [堆和栈的区别](https://blog.csdn.net/hairetz/article/details/4141043)
+  * https://blog.csdn.net/K346K346/article/details/80849966
+  * https://www.jianshu.com/p/05b4830a0010
+  * https://blog.csdn.net/a514371309/article/details/77987349
 * 进程和线程
   * 进程是操作系统分配资源的单位
   * 线程是CPU调度和分配的最小单位；多个线程共享进程内的地址空间；线程独立拥有自己的堆栈和局部变量
   * 线程可以在用户态实现，也可以在内核态实现
+
+* [变量名怎么存储](https://www.zhihu.com/question/34266997)
 
 # 数据库
 
@@ -1317,6 +1331,9 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
   * 传播时延：分组需要在电缆上面跑
   * 传播时延是物理层的问题，其余时延是链路层的问题
 
+* [URI、URL](https://zhuanlan.zhihu.com/p/56540212)
+* [http协议](https://www.cnblogs.com/ranyonsue/p/5984001.html)
+
 # 知识储备
 
 * [danale_gitlab](https://gitlab.dana-tech.com/be/plt-team/plt-biz-team/plt-biz-team-doc/tree/master/biz-group)
@@ -1327,6 +1344,8 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
 
 * [指针与引用](https://www.cnblogs.com/pythonista/p/11178705.html)
 
+* [google全家桶安装](https://www.zhihu.com/question/24693274)
+
 * [为什么我们需要制品管理](https://xie.infoq.cn/article/f5f72e8a25f5b6581c0a2fb66)
 
 * [APNs推送机制](https://www.jianshu.com/p/958ca3fd3cef)
@@ -1334,6 +1353,7 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
 * [交叉编译详解](https://blog.csdn.net/pengfei240/article/details/52912833)
 
 * [正向代理和反向代理的区别](https://cloud.tencent.com/developer/article/1418457)
+  
   * 正向代理和反向代理都架设在客户和服务器之间，提供缓存，提高访问速度
   * 正向代理为客户服务，可以访问一些受限制的资源；客户知道目标服务器的IP，但目标服务器不知道客户的IP
   * 反向代理为服务器服务，可以提供负载均衡和安全访问；此时，客户并不知道目标服务器的IP
@@ -1419,6 +1439,7 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
     6. 新建tag
     7. CI
     8. 在harbor中查看
+  
 * 在helm charts中添加该业务程序的配置文件
     1. git clone helm charts的业务仓库
     2. 新建业务代码目录，如idgen.idgen-pvt-svr
@@ -1542,8 +1563,6 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
 
 # 临时记录
 
-* [channel](https://colobu.com/2016/04/14/Golang-Channels/)（https://blog.csdn.net/sureSand/article/details/79633926）
-
 ```plsql
 create table if not exists payment_device_summary
 (
@@ -1636,17 +1655,4 @@ create table if not exists form
     on conflict do nothing;
 ```
 
-https://www.cnblogs.com/liang1101/p/7285955.html
-
-https://blog.csdn.net/fly910905/article/details/104360402
-
-* ```javascript
-  https://b.com/oauth/token?
-   client_id=CLIENT_ID&
-   client_secret=CLIENT_SECRET&
-   grant_type=authorization_code&
-   code=AUTHORIZATION_CODE&
-   redirect_uri=CALLBACK_URL
-  域名、http请求post、URL参数
-  请求内容放在post和网址里有什么区别
-  ```
+https://www.jianshu.com/p/05b4830a0010
