@@ -1,4 +1,6 @@
+# # XYZ
 
+* 编程语言只是一种工具，更让人兴奋的是，这个工具是怎么造出来的
 
 # Python
 
@@ -252,6 +254,8 @@ if __name__ == "__main__":
   
 * [go语言设计与实现](https://draveness.me/golang/docs/part2-foundation/ch04-basic/golang-function-call/)
 
+* [go语言高级编程](https://chai2010.gitbooks.io/advanced-go-programming-book/content/)
+
 * [W3C school](https://www.w3cschool.cn/go/go-tutorial.html)
 
 * [函数方法](https://www.runoob.com/go/go-method.html)
@@ -278,16 +282,231 @@ if __name__ == "__main__":
 * 注意事项
 
   * `go mod`中的`module bi-relay-statistics`似乎指定了项目的根目录。如果要使用本地的package需要更改
+  
   * import添加包时必须以上述`module+package`形式导入。不能只添加包名
+  
   * 同一个package内的函数互相引用，不需要加package.func_name
+  
   * `强制`package内的函数、结构体如果被外部使用，则需要将函数名、结构体名首字母大写
+  
   * `规范`package内的函数、结构体如果没有被外部使用（局部使用），则需要将函数名、结构体名首字母小写，如果是单词拼写，则用大写分割，如`getDeviceId`；package名都小写，如果是单词拼写，则使用下划线分割
+  
   * 对外暴露的函数、结构体（即首字母大写的函数等）写注释时，需要遵从这样的规范`//函数名 注释`
+  
   * 定义结构体方法时，可以传值，也可以传指针，后者可以改变变量的值
   
+  * 一个goroutine内部，代码不一定是顺序执行的
+  
+    * 运行时，大概有几种错误类型：一是main函数无法看到被修改后的done，因此main的for循环无法正常结束；二是main函数虽然看到了done被修改为true，但是msg依然没有初始化，这将导致错误的输出
+  
+    ```go
+    var msg string
+    var done bool = false
+    func main() {
+        go func() {
+            msg = "hello, world"
+            done = true
+        }()
+        for {
+            if done {
+                println(msg); break
+            }
+            println("retry...")
+        }
+    }
+    ```
+  
+* 使用锁同步goroutine
+
+  * 代码中，sync.Mutex必须先Lock然后再Unlock，因为直接Unlock一个Mutex对象会导致panic。代码中，done.Unlock()和第二个done.Lock()分别在不同的Goroutine，它们会强制做一次时间同步。因此最后main函数也可以正常打印msg字符串。
+
+  ```go
+  var msg string
+  var done sync.Mutex
+  func main() {
+      done.Lock()							//注意
+      go func() {
+          msg = "hello, world"
+          done.Unlock()					//注意
+      }()
+      done.Lock()							//注意
+      println(msg)
+  }
+  ```
+
+  
+
 * [闭包示例——较烧脑](https://segmentfault.com/a/1190000018689134)
 
+  * WithNodeID,WithServName即闭包用法，将外部函数的参数作为里面函数的参数，即，返回一个经外部函数参数“装饰”过的函数、
+
+  * 疑惑：直接把nodeID，serverName作为函数packAndCall的参数不好吗？为啥要用闭包，为了炫技吗？
+
+    ```go
+    type callOptions struct {
+    	nodeID      uint32
+    	serviceName string
+    	dialTimeOut int
+    	callTimeOut int
+    	useSSL      bool
+    	token       string
+    }
+    
+    type CallOption func(*callOptions)
+    
+    //WithNodeID 使用节点ID nid
+    func WithNodeID(nid uint32) CallOption {
+    	return func(o *callOptions) {
+    		o.nodeID = nid
+    	}
+    }
+    
+    //WithServName 使用服务名
+    func WithServName(servName string) CallOption {
+    	return func(o *callOptions) {
+    		o.serviceName = servName
+    	}
+    }
+    
+    //CallWithNodeId 使用context的rpc调用
+    func (clis *Clients) CallWithNodeId(serverName string, nodeID uint32, method string, args interface{}, reply interface{}) error {
+    	return clis.packAndCall(context.TODO(), method, args, reply, WithNodeID(nodeID), WithServName(serverName))
+    }
+    
+    func (clis *Clients) packAndCall(cxt context.Context, method string, args interface{}, reply interface{}, opts ...CallOption) (err error) {
+    
+    	var callOpt callOptions
+    	for _, opt := range opts {
+    		opt(&callOpt)
+    	}
+    }
+    ```
+
+    
+
 * [panic](https://blog.csdn.net/netdxy/article/details/71339115)
+
+  * 被调函数中触发panic后，如果被调函数中有defer recover代码，则被调函数中panic后的代码不会执行、被调函数中defer会执行、main会全部执行
+  * 被调函数中触发panic后，如果被调函数中没有defer recover代码，被调函数中有defer代码，则被调函数中panic后的代码不会执行，被调函数中defer会执行、main中的defer会执行、main中触发panic后的代码不会执行
+  * goroutine中触发panic后，如果goroutine中没有defer recover代码，goroutine中有defer代码，则goroutine中panic后的代码不会执行，goroutine中defer代码会被执行，main函数会在goroutine触发panic的时刻全部停止（main中的defer不会执行）
+  * 总结：
+    * defer语句在当前函数中永远会执行（goroutine中触发panic没有recover，则main中的defer不会执行；被调函数中触发panic没有recover，则main中的defer会执行）；
+    
+    * recover永远和defer在一起；
+    
+    * 有了recover，程序就不会输出panic错误；goroutine中的panic会影响main正常执行，即goroutine触发panic后，程序整体退出，main中的defer不会执行（考虑到goroutine和main执行不同步，可能main中的语句先执行完，goroutine才触发panic）
+    
+    * 实验代码
+    
+      ```go
+      package main
+      
+      import (
+      	"fmt"
+      	"sync"
+      	"time"
+      )
+      
+      func fullName(firstName *string, lastName *string, wg sync.WaitGroup) {
+      	defer fmt.Println("deferred call in goroute")
+      	//defer r()
+      	if firstName == nil {
+      		panic("runtime error: first name cannot be nil")
+      	}
+      	if lastName == nil {
+      		panic("runtime error: last name cannot be nil")
+      	}
+      	fmt.Printf("%s %s\n", *firstName, *lastName)
+      	fmt.Println("returned normally from fullName")
+      }
+      func r(){
+      	recover()
+      	fmt.Println("deferred call in r")
+      }
+      
+      func main() {
+      	defer fmt.Println("deferred call in main")
+      	firstName := "Elon"
+      	go fullName(&firstName, nil, wg)
+      	time.Sleep(time.Second * 5)
+      	fmt.Println("returned normally from main")
+      }
+      ```
+    
+  
+* 理解接口的例子
+
+  * 结构体、函数`handler`、非函数`myint`都可以定义方法
+  * 只要实现了接口中的方法，就可以通过该接口名，调用不同结构体、函数、非函数中的该方法，即，一个接口，多个调用
+  * 函数也可以被强制类型转换`handler(doubler)`
+
+  ```go
+  //下面让我们详细看一下例子，其中涉及了函数、函数的方法、结构体方法、接口的使用。
+  package main
+  
+  import (
+  	"fmt"
+  )
+  
+  //定义接口
+  type adder interface {
+  	add(string) int
+  }
+  
+  //定义函数类型
+  type handler func (name string) int
+  
+  //实现函数类型方法
+  func (h handler) add(name string) int {
+  	return h(name) + 10
+  }
+  
+  //函数参数类型接受实现了adder接口的对象（函数或结构体）
+  func process(a adder) {
+  	fmt.Println("process:", a.add("taozs"))
+  }
+  
+  //另一个函数定义
+  func doubler(name string) int {
+  	return len(name) * 2
+  }
+  
+  //非函数类型
+  type myint int
+  
+  //实现了adder接口
+  func (i myint) add(name string) int {
+  	return len(name) + int(i)
+  }
+  
+  func main() {
+  	//注意要成为函数对象必须显式定义handler类型
+  	var my handler = func (name string) int {
+  		return len(name)
+  	}
+  
+  	//以下是函数或函数方法的调用
+  	fmt.Println(my("taozs"))                   //调用函数
+  
+  	fmt.Println(my.add("taozs")) //调用函数对象的方法
+  
+  	fmt.Println(handler(doubler).add("taozs")) //doubler函数显式转换成handler函数对象然后调用对象的add方法
+  
+  	//以下是针对接口adder的调用
+  	process(my) //process函数需要adder接口类型参数
+  
+  	process(handler(doubler)) //因为process接受的参数类型是handler，所以这儿要强制转换
+  
+  	process(myint(8)) //实现adder接口不仅可以是函数也可以是结构体
+  }
+  
+  #输出为5
+  15
+  20
+  process: 15
+  process: 20
+  process: 13
+  ```
 
 * [channel](https://www.jianshu.com/p/24ede9e90490)
 
@@ -305,8 +524,10 @@ if __name__ == "__main__":
   
 * 编程踩坑
 
-  * len(管道)会随时变化
+  * 考虑goroutine和main执行不同步，前者一般慢于后者
 
+  * len(管道)会随时变化
+  
     ```go
     package main
     
@@ -324,11 +545,11 @@ if __name__ == "__main__":
     	}
     }
     //输出为1 2
-    //没有3
+  //没有3
     ```
 
   * 指针
-
+  
     ```go
     package main
     
@@ -355,11 +576,11 @@ if __name__ == "__main__":
     	fmt.Println(st2)
     }
     //输出结果：{99 [1 2 3] good map[xiaohua:11 xiaoming:10]}
-    //        &{99 [1 2 3] good map[xiaohua:11 xiaoming:10]}
+  //        &{99 [1 2 3] good map[xiaohua:11 xiaoming:10]}
     ```
 
   * 并发
-
+  
     ```go
     package main
     
@@ -389,9 +610,9 @@ if __name__ == "__main__":
     
     }
     //输出为：10026230153 
-    //or 10029343835
+  //or 10029343835
     ```
-
+  
     预期输出为20000000000。可见，并发冲突很严重
 
 # linux
@@ -717,7 +938,7 @@ git log
 * [堆和栈的区别](https://blog.csdn.net/hairetz/article/details/4141043)
   * https://blog.csdn.net/K346K346/article/details/80849966
   * https://www.jianshu.com/p/05b4830a0010
-  * https://blog.csdn.net/a514371309/article/details/77987349
+  * [为什么要区分堆和栈](https://blog.csdn.net/a514371309/article/details/77987349)
 * 进程和线程
   * 进程是操作系统分配资源的单位
   * 线程是CPU调度和分配的最小单位；多个线程共享进程内的地址空间；线程独立拥有自己的堆栈和局部变量
@@ -1295,11 +1516,12 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
 * bi-relay-statistics
   * main.go文件中base.Start进入主要部分
   * consumer.go文件最重要的两个函数it.write和it.consume，先执行前者，后执行后者，但阅读代码应当先读后者
+  * consumer.go消费的是云厂商的日志（数据来源），需要填云厂商的用户名密码
   * it.consume中，在管道consumeChan中经解析parse等得到除UserClientCode，UserCompanyCode，DeviceProductCode，DeviceCompanyCode这四个字段外的所有数据
   * it.write中，从管道consumeChan中读取数据到buffer，并通过查询postgresql数据库（代码中体现为package psql）得到四个字段对应的值（以前通过查询线上数据库，使用package dorm），将完善后的数据写入 /media/efs/dana/dbd/bi-binlog/logstore，后续供data_warehouse读取
   *  /media/efs/dana/dbd/bi-relay-statistics/logs是go代码执行产生的日志文件，/media/efs/dana/dbd/bi-relay-statistics/logstore是go代码的目标输出
-  *  /media/efs/dana/dbd/bi-relay-statistics/timer.sh定时将/media/efs/dana/dbd/bi-relay-statistics/logstore中昨天的文件复制到/opt/oss/logstore/relay-connection-information，并将/media/efs/dana/dbd/bi-relay-statistics/logstore目录下15天前的数据删除
-
+*  /media/efs/dana/dbd/bi-relay-statistics/timer.sh定时将/media/efs/dana/dbd/bi-relay-statistics/logstore中昨天的文件复制到/opt/oss/logstore/relay-connection-information，并将/media/efs/dana/dbd/bi-relay-statistics/logstore目录下15天前的数据删除
+  
 * bi-binlog
 
   * 程序理解流图
@@ -1656,3 +1878,34 @@ create table if not exists form
 ```
 
 https://www.jianshu.com/p/05b4830a0010
+
+1. gitlab在浏览器输过一次TFA验证码后，再开一次gitlab标签页后，就不需要输入验证码了
+
+2. etcd可以作为kv存储的中间件，中间件是啥？
+
+3. go的底层
+
+4. [CPU时钟](https://blog.csdn.net/stpeace/article/details/78309668)
+
+5. goroutine调度https://www.cnblogs.com/secondtonone1/p/11803961.html https://learnku.com/articles/35045
+
+6. 通过vpn和代理上外网原理是否一样
+
+7. golang协程之间的切换是不可预测的吗？遵循怎样的规则？
+
+8. runtime.Gosched没有时间的概念，只有出让次数的概念？
+
+9. interface{}用法
+
+   ```go
+   func test(a int, b int) interface{} {
+   	c:= a+b
+   	return c
+   }
+   ```
+
+   https://www.cnblogs.com/codersaver/p/14359116.html
+   
+10. 配置文件.yml为什么不会被编译到代码二进制文件中？
+
+11. 闭包和装饰器
