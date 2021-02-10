@@ -382,7 +382,7 @@ if __name__ == "__main__":
     }
     ```
 
-    
+* [`...`用法](https://blog.csdn.net/jeffrey11223/article/details/79166724)
 
 * [panic](https://blog.csdn.net/netdxy/article/details/71339115)
 
@@ -515,6 +515,7 @@ if __name__ == "__main__":
   * https://www.cnblogs.com/liang1101/p/7285955.html
   * https://blog.csdn.net/sureSand/article/details/79633926
   * 无缓存channel必须在两个协程里使用（或者main和一个协程），如果仅在main函数中使用，只写不读，将会阻塞
+  * https://colobu.com/2016/04/14/Golang-Channels/
 
 * [结构体][https://blog.csdn.net/fly910905/article/details/104360402]
 
@@ -1909,3 +1910,5 @@ https://www.jianshu.com/p/05b4830a0010
 10. 配置文件.yml为什么不会被编译到代码二进制文件中？
 
 11. 闭包和装饰器
+
+12. sleep和时钟中断有什么区别？
