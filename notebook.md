@@ -1,7 +1,19 @@
 # # XYZ
 
 * 编程语言只是一种工具，更让人兴奋的是，这个工具是怎么造出来的
-* 
+
+* ```
+  - **O: CarPlay和Google Auto 地理围栏**
+      - 描述：CarPlay和Google Auto是苹果和谷歌提供的手机向车载系统映射APP的功能，可通过车载系统直接控制车库门开关；
+             用户通过APP设置车库门地理围栏，当用户位置接近车库门位置，自动开启车库门；用户位置离开车库门，自动关闭车库门
+      - KR1：输出CarPlay和Google Auto调研报告（结合使用场景和技术实现，考虑安全、可行性、合理性）
+      - KR2：输出地理围栏调研报告（结合使用场景和技术实现，考虑安全、可行性、合理性）
+      - 预计进度：
+          - KR1: 2021-05-17/2021-05-21 100%
+          - KR2: 2021-05-24/2021-05-28 100%
+          
+          active_consumer、active_device、active_device_info、bind、consumer、form、form_device_views、manufacture_device、new_device、share、subscribe、
+  ```
 
 # Python
 
@@ -2108,7 +2120,8 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
 
     * 激活设备：设备在平台注册，线上表`dana_sync.video_device`有该设备的记录
 * 有效设备：设备与APP绑定，线上表`dana_sync.video_user_device_map`
-    * 活跃设备：即与平台保持心跳的设备
+  
+  * 活跃设备：即与平台保持心跳的设备
   
 * 查找各虚拟机上部署应用
 
@@ -2141,20 +2154,8 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
   '
   ```
 
-  ```
-  ## 2021张凱OKR Q2
   
-  ### Q2(2021-04-01/2021-06-30)
   
-  - **O: alisz应用迁移到k8s**
-      - 描述: 输出alisz待迁移应用列表（需要查看所有机器确认所有应用，systemd，docker，crontab），编写alisz应用列表中所有应用的helm charts，除大数据
-      - KR1: 输出alisz待迁移应用列表
-      - KR2: 编写alisz应用列表中所有应用的helm charts
-      - 预计进度: 
-          - KR1: 2021-04-01/2021-04-9 100%
-          - KR2: 2021-04-12/2021-05-15 100%
-  ```
-
 * 业务理解
 
   * 云平台成本：带宽（relay）、存储（bucket）、人脸识别算法和算力（faceR，按照调用次数收费）
@@ -2701,6 +2702,8 @@ https://www.jianshu.com/p/05b4830a0010
 36. 什么是容器编排
 
 37. sed https://www.runoob.com/linux/linux-comm-sed.html
+
+38. 后端开发为什么需要鉴权，什么场景下需要鉴权
 
 
 
