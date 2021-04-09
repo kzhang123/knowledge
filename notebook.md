@@ -921,6 +921,23 @@ if __name__ == "__main__":
   
     预期输出为20000000000。可见，并发冲突很严重
 
+# Shell
+
+* ```bash
+  #!/usr/bin/env bash
+  #只保留7天的日志文件
+  logstore=sz-p2p-relay-dbd-common
+  
+  target=$(date --utc -d last-day "+%Y-%m-%d")
+  del_target=$(date --utc -d "7 days ago" "+%Y-%m-%d")
+  cd /media/efs/dana/dbd/bi-relay-statistics/logstore || exit
+  cp "${logstore}"-"${target}" /opt/oss/logstore/relay-connection-information/"${target}"
+  rm ./*-"${del_target}"
+  
+  ```
+
+* 
+
 # linux
 
 * [添加动态库路径](https://blog.csdn.net/liu0808/article/details/79012187)
@@ -942,6 +959,10 @@ if __name__ == "__main__":
   只能有4个主分区，其中一个可以作为扩展分区，扩展分区可以分为多个逻辑分区
   
 * [软硬链接](https://zhuanlan.zhihu.com/p/67366919)
+
+  * Linux通过iNode区分文件和目录
+  * 软链接和被链接对象有不同的iNode
+  * 硬链接和被链接对象有相同的iNode
 
 * 常用命令
 
@@ -1123,7 +1144,7 @@ Ctrl+B
 * [vim字符替换](https://blog.csdn.net/doubleface999/article/details/55798741)
 
   ```bash
-  #将文件中的所有manufacture_device替换为device
+  #将文件中的所有manufacture_device替换为device，/g 表示一行上的替换所有的匹配），s表示替换
   :%s/manufacture_device/device/g
   #查找device,摁N查找下一个，摁n查找上一个
   :/device
@@ -1166,7 +1187,19 @@ Ctrl+B
 
 
 * [sed](https://coolshell.cn/articles/9104.html)
+
+  * 处理指定行；用分隔符分隔指定行；打印第几个字段等
 * [awk](https://coolshell.cn/articles/9070.html)
+  
+  * https://www.ruanyifeng.com/blog/2018/11/awk.html
+  * `a`:append; `d`:delete;`s`:switch，替换;`N`:next，处理下一行；
+  * 不同的功能会使用不同的语法
+  * `-n`仅输出被处理过的行，而不是输出所有行
+* grep
+  * `grep "good" example.txt| grep "bad" `既要有good也要有bad
+  * `grep -E "good|bad|" example.txt`good或者bad
+  * `grep "^g"`开头是g
+  * `-i`忽略大小写；`-n`显示行号；`-v`反向查找
 
 # 指令
 
@@ -1230,6 +1263,14 @@ git log
   ```
   
 * [安装证书](http://notes.maxwi.com/2017/10/14/certificates-import-linux/)
+
+* 关闭终端后继续运行相应进程https://www.cnblogs.com/baby123/p/6477429.html
+
+  ```bash
+  nohup ./test.sh &
+  ```
+
+  
 
 * 上线bi-relay-statistics（Makefile中有Pandora，因此`make`命令后，会自动build并将二进制文件上传到Pandora）
 
@@ -1311,6 +1352,10 @@ git log
 * InfluxDb
 
   * https://www.jianshu.com/p/d71646c08317
+
+* timescaledb
+
+  * http://www.pgsql.tech/project_303_10000020
 
 * postgresql
 
@@ -1395,6 +1440,7 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
   * Postgres语法和Mysql不一样
   * Postgres不能用双引号
   * 注意中英文切换
+  * 插入`inet`类型和`date`类型`"insert into table values (date '2022-01-21',12,'110.77.137.2')"`
 
 * SQL语法总结
 
@@ -1429,6 +1475,13 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
     insert into scorebak select * from socre where neza='neza'   --插入一行,要求表scorebak 必须存在
     select *  into scorebak from score  where neza='neza'  --也是插入一行,要求表scorebak 不存在
     ```
+    
+  * 聚合
+
+    * 字段之间的关系可能是“一对多”，如班级和学生，那么应当`group by 班级`而不是`group by 学生`
+  * `group by `一定伴随着聚合函数
+    
+  * 聚合之后就会产生一张新表，如果需要对新表的字段进行筛选，那么就需要`having`语句（为什么不用`where`？因为`where`筛选的是旧表）
     
   * 将表websites复制为一个新表website
 
@@ -2111,17 +2164,20 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
 * 分支节点各表含义
 
   * `valid_device`是从`active_device`中选择某段日期，筛选出来的
-
+  * 因此，该有效设备这个概念是依托于具体的指标而存在的，如对于指标“30日超过7天的活跃设备”，那么有效设备指在最近30天内所有的活跃设备
+  
   ```plsql
   consumer_code.code=active_consumer.code
   ```
-
-  * 有效设备、激活设备、活跃设备、有效活跃设备
-
+```
+  
+* 有效设备、激活设备、活跃设备、有效活跃设备
+  
     * 激活设备：设备在平台注册，线上表`dana_sync.video_device`有该设备的记录
 * 有效设备：设备与APP绑定，线上表`dana_sync.video_user_device_map`
   
   * 活跃设备：即与平台保持心跳的设备
+  * 
   
 * 查找各虚拟机上部署应用
 
@@ -2152,10 +2208,10 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
   crontab -l >> /home/sreuser/zhangkai
   echo "#########################################################" >>/home/sreuser/zhangkai
   '
-  ```
+```
 
   
-  
+
 * 业务理解
 
   * 云平台成本：带宽（relay）、存储（bucket）、人脸识别算法和算力（faceR，按照调用次数收费）
@@ -2178,6 +2234,8 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
 * [中间件](http://c.biancheng.net/view/3860.html)
 * [有状态服务和无状态服务](https://zhuanlan.zhihu.com/p/65762125)
   * 信息保存在请求方是无状态的；信息保存在响应方是无状态的。
+* Aliyun登录
+  * https://signin.aliyun.com/login.htm#/main
 
 # 计算机网络
 
@@ -2704,6 +2762,50 @@ https://www.jianshu.com/p/05b4830a0010
 37. sed https://www.runoob.com/linux/linux-comm-sed.html
 
 38. 后端开发为什么需要鉴权，什么场景下需要鉴权
+
+39. timescaledb和postgresql
+
+40. ```go
+    func Run(tablesConf internal.Tables) (err error) {
+    	//分别处理各表
+    	var wg sync.WaitGroup
+    	for _, table := range tablesConf.Tables {
+    		wg.Add(1)
+    		go func(temp internal.Table) {
+    			tableStart := service.TableStart{TableConf: temp}
+    			logx.X.Infom("tableStart configuration", "tableStart", tableStart)
+    			err=tableStart.Init()
+    			if err != nil {
+    				logx.X.Error(err)
+    				wg.Done()
+    				return
+    			}
+    
+    			err = tableStart.StartReload()
+    			if err != nil {
+    				logx.X.Error(err)
+    				wg.Done()
+    				return
+    			}
+    			wg.Done()
+    		}(table)
+    
+    	}
+    	wg.Wait()
+    
+    	return
+    }
+    ```
+
+41. postgresql中的exception机制和procedure机制 https://blog.csdn.net/qq_31156277/article/details/84931843
+
+42. SSR开发方案
+
+43. 协程池包替换
+
+44. https://github.com/NVIDIA/NeMo
+
+45. https://zhuanlan.zhihu.com/p/72028159
 
 
 
