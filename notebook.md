@@ -2,6 +2,8 @@
 
 * 编程语言只是一种工具，更让人兴奋的是，这个工具是怎么造出来的
 
+* 制造和使用工具是人的本性
+
 * ```
   - **O: CarPlay和Google Auto 地理围栏**
       - 描述：CarPlay和Google Auto是苹果和谷歌提供的手机向车载系统映射APP的功能，可通过车载系统直接控制车库门开关；
@@ -1064,6 +1066,39 @@ Ctrl+B
 
 * [typora](https://sspai.com/post/54912)
 
+  * todo list
+
+    - [x] 看书
+    - [ ] 做饭
+
+    ```bash
+    - [x] 看书
+    - [] 做饭
+    ```
+
+  * 左侧阴影
+
+    > 从前有座山，
+    >
+    > 山里有座庙
+
+    ```bash
+    > 从前有座山
+    > 山里有座庙
+    ```
+
+  * 一个单元格里放两行字
+
+    | 小明 | 小刚         |
+    | ---- | ------------ |
+    | good | good <br>bad |
+
+    ```bash
+    good <br> bad
+    ```
+
+  * typora在绘制很长的表格时，可配合wps进行操作
+
 * [typora画图](https://zhuanlan.zhihu.com/p/172635547)
 
   * https://www.cnblogs.com/codeclock/p/13634272.html
@@ -1150,7 +1185,7 @@ Ctrl+B
   :/device
   ```
 
-* git
+* [git](https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E8%BF%9C%E7%A8%8B%E5%88%86%E6%94%AF)
 
   ```bash
   Run
@@ -1163,8 +1198,10 @@ Ctrl+B
   
   git config --global user.email "kzhang1@mail.ustc.edu.cn"
   git config --global user.name "Plt-张凱"
-  #删除分支
+  #删除本地分支
   git branch -d branchname
+  #删除远程分支
+  git push origin --delete feat/add_cloud-service_alisz
   #展示所有分支
   git branch -a
   #恢复修改
@@ -1338,6 +1375,9 @@ git log
     * [缺点](https://segmentfault.com/a/1190000015464889)：当正在运行的用户线程发生io而阻塞时，CPU会被让出，导致该进程内的其他线程也无法使用CPU
   * 内核级线程
 * [变量名怎么存储](https://www.zhihu.com/question/34266997)
+* 寄存器和高速缓存cache
+    * 寄存器是CPU的一部分
+    * cache
 
 # 算法
 
@@ -1805,6 +1845,8 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
 * [CC攻击和DDOS攻击](https://blog.csdn.net/weixin_33717298/article/details/85975018)
   * CC针对应用层，针对网页，此网页会查询数据库，消耗大量资源
   * DDOS（分布式拒绝服务）针对网络层，针对IP，针对服务器
+* ssl
+  * https://www.jianshu.com/p/3665fbfc2243
 
 # 工作
 
@@ -2228,6 +2270,26 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
   * 集群：即功能的横向扩展：虚拟机集群，redis集群（其实是不同虚拟机上都部署了redis，各redis完全相同）
   * 虚拟机：jms上列出来的就是虚拟机，云厂商把一个机器8核16G，拆成8个1核2G的虚拟机
   * k8s: 在100台虚拟机上部署相同的应用，非常费劲，配置文件不一致容易出错。比如，40台配置文件一致，60台配置文件一致，共2份配置文件。通过k8s将应用程序和配置文件打包成2个应用，放在不同的企业空间，可以实现一键部署100台机器。
+  * ferry是一个组件，
+    * 当发生跨节点调用时，有两种方式。一种是直接通过ip、port调用其他节点的服务，另一种是通过本节点的ferry转发给另一个节点的ferry。
+    * 安全性：可以只留ferry服务端口对外，而不是所有的应用都对外
+    * 流量监控：所有跨节点调用都在ferry处可查（类似中央集权）
+  * 为什么要用阿里云的日志服务sls
+    * 虚拟机磁盘一般是40G，而有的应用产生的日志非常大，放不下
+    * 非常大的日志文件进行全量搜索非常慢，而阿里云的日志服务可以查的很快，支持SQL搜索等
+  * etcd用于服务注册与发现
+    * 服务注册：应用A将ip、端口、token（此应用自己生成的）注册到etcd
+    * 服务发现：应用B从etcd订阅得到应用A的ip、端口、token，然后拿着这些东西直接去调应用A，应用A会对token进行验证
+  * falcon-agent和pprof的区别
+    * falcon-agent在代码中可以调用bmon等package；将程序运行状态发送到运行在虚拟机的应用falcon-agent，然后发送给中心节点，然后配置告警规则等
+    * pprof在代码中可以调用pprof等package；在代码运行时，可以通过ip、端口打开浏览器，观察到应用占用的CPU、内存等，如果发现内存占用率过高，可以查看程序的调用栈，从而定位问题；一旦程序崩溃，则不能再使用
+  * 为什么容器需要限制CPU、内存等资源
+    * 如果不限制，一个程序内存飙升，可能导致整台虚拟机上的所有应用崩溃
+  * k8s中的亲和度affinity
+    * 给不同的node打label，然后给应用的配置文件中添加亲和度（即某种label），这样k8s调度pod时，会优先部署在对应label的node上
+  * 就绪指针和存活指针
+    * 存活指针：该容器是否在运行
+    * 就绪指针：该容器是否可以处理业务
 
 # 云计算
 
@@ -2806,6 +2868,15 @@ https://www.jianshu.com/p/05b4830a0010
 44. https://github.com/NVIDIA/NeMo
 
 45. https://zhuanlan.zhihu.com/p/72028159
+
+46. https://www.qikqiak.com/k8s-book/docs/32.DaemonSet%20%E4%B8%8E%20StatefulSet.html
+
+47. https://www.kubernetes.org.cn/6935.html
+
+48. 证书
+
+    * https://juejin.cn/post/6844903965499342855
+    * https://www.cnblogs.com/f-ck-need-u/p/7113610.html
 
 
 
