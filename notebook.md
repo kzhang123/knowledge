@@ -301,6 +301,19 @@ if __name__ == "__main__":
 
 * [runtime.Caller](https://colobu.com/2018/11/03/get-function-name-in-go/)
 
+* go依赖包下载位置
+
+  * go mod：`$GOPATH/pkg/mod`
+  * go get：
+
+* go build
+
+  * `go build -o binary_name ./app/main.go`
+  * 依赖包寻找顺序（非go mod）:
+    1. $GOROOT/src
+    2. $GOPATH/src
+  * 如果仅执行`go build`，则当前目录下应当有main module
+
 * [slice](https://zhuanlan.zhihu.com/p/61121325)
 
   * 初始化方式
@@ -594,7 +607,6 @@ if __name__ == "__main__":
       	fmt.Println("returned normally from main")
       }
       ```
-    
   
 * 理解接口的例子
 
@@ -918,7 +930,7 @@ if __name__ == "__main__":
     
     }
     //输出为：10026230153 
-  //or 10029343835
+    //or 10029343835
     ```
   
     预期输出为20000000000。可见，并发冲突很严重
@@ -938,7 +950,34 @@ if __name__ == "__main__":
   
   ```
 
-* 
+* [Shell脚本中eq，ne，le，ge，lt，gt意义](https://www.jianshu.com/p/f30286cce4d5)
+
+  * -gt：大于
+
+* find
+
+  * 仅列出当前目录及子目录下所有文件`find . -type f`
+
+* sed
+
+  * 注意：sed中如果要使用变量，需要用双引号
+
+  ```bash
+  newbiz=pandora
+  newapp=pandora-auth-server
+  #修改当前目录及子目录下所有文件，sed替换
+  sed -i "s/dpush.dpns-gateway/$newbiz.$newapp/g" `find . -type f`
+  sed -i "s/dpns-gateway/$newapp/g" `find . -type f`
+  sed -i 's/2.1.5/0.2.0/g' `find . -type f`
+  #修改当前目录及子目录，sed替换
+  for file in `find . -name "*dpns-gateway*"`
+  do
+  newfile=`echo $file | sed "s/dpns-gateway/$newapp/g"`
+  mv $file $newfile
+  done
+  ```
+
+  
 
 # linux
 
@@ -965,6 +1004,18 @@ if __name__ == "__main__":
   * Linux通过iNode区分文件和目录
   * 软链接和被链接对象有不同的iNode
   * 硬链接和被链接对象有相同的iNode
+
+* 查看某进程的资源占用
+
+  1. 获取该进程的pid` ps -ef | grep dana-invoice-service`
+  2. 查看资源占用`top -p 8756`
+
+* [/dev/random 与 /dev/urandom 的区别](http://blog.lujun9972.win/blog/2018/02/05/-dev-urandom%E5%92%8C-dev-random%E7%9A%84%E5%8C%BA%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88/index.html)
+
+  * 前者是真随机，依赖计算机系统熵值，有可能被挂起
+  * 后者是伪随机
+  * 一般用后者
+  * c：字符设备文件
 
 * 常用命令
 
@@ -1011,10 +1062,11 @@ if __name__ == "__main__":
   
   echo 1 > /proc/sys/vm/drop_caches  释放内存缓存
   
+  sudo hostnamectl set-hostname masterkai   更改主机名为masterkai
+  
   ​```
   
   ```
-  
 
 
 # 技巧
@@ -1053,7 +1105,7 @@ if __name__ == "__main__":
   #返回上一级代码
   alt+左
   #跳转到函数调用处
-Ctrl+B
+  Ctrl+B
   ```
   
   
@@ -1110,6 +1162,10 @@ Ctrl+B
 * [datagrip使用指南](https://www.jb51.net/softjc/666676.html)
 
 * [markdown画图](https://mermaid-js.github.io/mermaid/#/)
+
+* vps及翻墙
+
+  * https://blog.starryvoid.com/archives/76.html
 
 * [谷歌安装器](https://xiaomifirmware.com/downloads/download-google-installer-3-0-xiaomi/)
 
@@ -1220,18 +1276,35 @@ Ctrl+B
   git rebase master
   git checkout master
   git merge experiment
+  
+  git status                               # 查看文件的状态 
+  git add -A                              # 提交所有变化
+  git add -u                              # 提交被修改(modified)和被删除(deleted)文件，不包括新文件(new)
+  git add .                                 # 提交新文件(new)和被修改(modified)文件，不包括被删除(deleted)文件
+  git log
+  git branch -u debug origin/debug       # 把本地的debug变为origin/debug的跟踪分支（--set-upstream）
+  git tag                                                     # 列出当前的标签
+  git tag -a v1.0 -m "xxx"                         # 创建标签
+  git tag -d v1.0                                        # 删除标签
+  git push origin --tags                            # 推送本地标签到远程仓库
+  git push origin :refs/tags/v1.0             # 删除远程仓库标签
+  
   ```
-
-
+  
+  * remote，origin区别
+    * 一个本地仓库可能跟踪多个远程仓库（虽然一般情况下，只会跟踪一个远程仓库），这个远程叫做remote；多个远程仓库需要区分，所以有一个远程仓库叫origin（自己起名），另一个远程仓库可能叫origin_2
+  
 * [sed](https://coolshell.cn/articles/9104.html)
 
   * 处理指定行；用分隔符分隔指定行；打印第几个字段等
+
 * [awk](https://coolshell.cn/articles/9070.html)
-  
+
   * https://www.ruanyifeng.com/blog/2018/11/awk.html
   * `a`:append; `d`:delete;`s`:switch，替换;`N`:next，处理下一行；
   * 不同的功能会使用不同的语法
   * `-n`仅输出被处理过的行，而不是输出所有行
+
 * grep
   * `grep "good" example.txt| grep "bad" `既要有good也要有bad
   * `grep -E "good|bad|" example.txt`good或者bad
@@ -1295,7 +1368,7 @@ Ctrl+B
   git tag v1.1.1
   git push origin --tags
   #后期加标签
-git log
+  git log
   git tag -a v1.2 9fceb02
   ```
   
@@ -1457,7 +1530,7 @@ git log
   * 改密码
   
   ```bash
-ALTER USER postgres WITH PASSWORD 'zhangkai';
+  ALTER USER postgres WITH PASSWORD 'zhangkai';
   ```
 
   * 以linux用户kai直接登录数据库（kai是superuser）
@@ -1803,8 +1876,12 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
   | SZ   | HK | EU   | US   | BJ   | GZ   |
   | ---- | ---- | ---- | ---- | ---- | ---- |
   |1|2|4|3|22|32|
-
-
+  
+  * AWSEU1:法兰克福
+  * AWSEU2：爱尔兰，用于判重、router，作用是中心节点
+    * 判重：用户注册的手机号、邮箱是否注册过
+    * router：各分支节点查router，并缓存在分支节点的router表中。AWSEU2集中存储router表。查询分布式，各接入节点查询router信息时，只需要查询分支节点的router表。
+  
 * 联表删除
 
   ```plsql
@@ -1847,6 +1924,19 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
   * DDOS（分布式拒绝服务）针对网络层，针对IP，针对服务器
 * ssl
   * https://www.jianshu.com/p/3665fbfc2243
+* 公私钥作用：
+  * 公钥用于加密
+  * 私钥用于身份认证
+  * 应用场景：
+    * 客户端免登录：
+      1. 登录gitlab。将个人用ssh-keygen命令生成的公钥上传到gitlab，将免去密码登录
+      2. 登录跳板机。将跳板机为个人生成的私钥下载到本地，用`ssh -i *.pem username@hostname`即可免密登录
+    * 服务器认证
+      * 服务器将CA证书（含服务器公钥）发给客户端，客户端用该公钥加密自己输入的账号、密码，只有拥有该私钥的服务器可以解密
+      * 自签发证书只能用于加密通信，但不能解决中间人攻击。因此，需要权威CA签发证书。
+* [OCSP](https://www.cnblogs.com/penghuster/p/6895714.html#:~:text=ocsp%EF%BC%88The%20Online%20Certificate,Status%20Protocol%EF%BC%89%E6%98%AF%E4%B8%80%E7%A7%8D%E9%AA%8C%E8%AF%81%E8%AF%81%E4%B9%A6%E7%8A%B6%E6%80%81%E7%9A%84%E4%B8%80%E7%A7%8D%E6%96%B9%E5%BC%8F%EF%BC%8C%E4%B9%9F%E6%98%AFCRL%EF%BC%88certificate%20revocation%20list%EF%BC%89%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80%E7%9A%84%E4%B8%80%E7%A7%8D%E6%9B%BF%E4%BB%A3%E6%96%B9%E5%BC%8F%E3%80%82)
+  * 用来验证证书是否过期的协议
+  * 
 
 # 工作
 
@@ -2081,7 +2171,7 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
   
     * ```go
       //查表
-    product := make([]DictProductJoinDictCompany, 0)
+      product := make([]DictProductJoinDictCompany, 0)
       err = danaSyncOrmCli.Table("dict_product").Join("INNER", "dict_company", "dict_product.company_id = dict_company.id").Find(&product)
       	
       ```
@@ -2219,7 +2309,7 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
 * 有效设备：设备与APP绑定，线上表`dana_sync.video_user_device_map`
   
   * 活跃设备：即与平台保持心跳的设备
-  * 
+  * 绑定设备：
   
 * 查找各虚拟机上部署应用
 
@@ -2257,39 +2347,75 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
 * 业务理解
 
   * 云平台成本：带宽（relay）、存储（bucket）、人脸识别算法和算力（faceR，按照调用次数收费）
-  * 设备侧的微服务：ip_devce_h,DNS,device_service,dms（为什么设备侧这么多微服务，APP侧只有一个?是不是有历史原因，比如平台和设备侧SDK关系亲密？）
+* 设备侧的微服务：ip_devce_h,DNS,device_service,dms（为什么设备侧这么多微服务，APP侧只有一个?是不是有历史原因，比如平台和设备侧SDK关系亲密？）
   * 设备固件内预埋DNS服务器地址
-  * 平台侧微服务：cloud_service_api
+* 平台侧微服务：cloud_service_api
   * APP侧微服务：UDH
-  * API网关：根据不同的功能，可能有不同的网关。比如做协议转换的网关，可以对https进行解密，转为http，这样发到其他服务器的请求就不用解密了
+* API网关：根据不同的功能，可能有不同的网关。比如做协议转换的网关，可以对https进行解密，转为http，这样发到其他服务器的请求就不用解密了
   * ferry是为了跨节点调用，类似于路由器，是一个API网关吗？
-  * 为什么需要流量治理，两个例子：
+* 为什么需要流量治理，两个例子：
     * 灰度发布时，需要把更多或某部分流量转发到部署高版本服务的服务器上
-    * 代替服务注册和发现，不需要rpc，通过网格治理，从某个地方发出来的流量，就认为是哪个服务
+  * 代替服务注册和发现，不需要rpc，通过网格治理，从某个地方发出来的流量，就认为是哪个服务
   * 为什么需要servicemesh：微服务通过rpc进行注册与发现，rpc写在代码中，Go应用有一套rpc，Python应用也有一套rpc，得整两套rpc，很烦。如果通过servicemesh，网格治理，就可以实现代码功能和服务注册发现解耦。
-  * 集群：即功能的横向扩展：虚拟机集群，redis集群（其实是不同虚拟机上都部署了redis，各redis完全相同）
+* 集群：即功能的横向扩展：虚拟机集群，redis集群（其实是不同虚拟机上都部署了redis，各redis完全相同）
   * 虚拟机：jms上列出来的就是虚拟机，云厂商把一个机器8核16G，拆成8个1核2G的虚拟机
-  * k8s: 在100台虚拟机上部署相同的应用，非常费劲，配置文件不一致容易出错。比如，40台配置文件一致，60台配置文件一致，共2份配置文件。通过k8s将应用程序和配置文件打包成2个应用，放在不同的企业空间，可以实现一键部署100台机器。
+* k8s: 在100台虚拟机上部署相同的应用，非常费劲，配置文件不一致容易出错。比如，40台配置文件一致，60台配置文件一致，共2份配置文件。通过k8s将应用程序和配置文件打包成2个应用，放在不同的企业空间，可以实现一键部署100台机器。
   * ferry是一个组件，
     * 当发生跨节点调用时，有两种方式。一种是直接通过ip、port调用其他节点的服务，另一种是通过本节点的ferry转发给另一个节点的ferry。
     * 安全性：可以只留ferry服务端口对外，而不是所有的应用都对外
     * 流量监控：所有跨节点调用都在ferry处可查（类似中央集权）
   * 为什么要用阿里云的日志服务sls
-    * 虚拟机磁盘一般是40G，而有的应用产生的日志非常大，放不下
+  * 虚拟机磁盘一般是40G，而有的应用产生的日志非常大，放不下
     * 非常大的日志文件进行全量搜索非常慢，而阿里云的日志服务可以查的很快，支持SQL搜索等
-  * etcd用于服务注册与发现
+* etcd用于服务注册与发现
     * 服务注册：应用A将ip、端口、token（此应用自己生成的）注册到etcd
-    * 服务发现：应用B从etcd订阅得到应用A的ip、端口、token，然后拿着这些东西直接去调应用A，应用A会对token进行验证
+  * 服务发现：应用B从etcd订阅得到应用A的ip、端口、token，然后拿着这些东西直接去调应用A，应用A会对token进行验证
   * falcon-agent和pprof的区别
-    * falcon-agent在代码中可以调用bmon等package；将程序运行状态发送到运行在虚拟机的应用falcon-agent，然后发送给中心节点，然后配置告警规则等
+  * falcon-agent在代码中可以调用bmon等package；将程序运行状态发送到运行在虚拟机的应用falcon-agent，然后发送给中心节点，然后配置告警规则等
     * pprof在代码中可以调用pprof等package；在代码运行时，可以通过ip、端口打开浏览器，观察到应用占用的CPU、内存等，如果发现内存占用率过高，可以查看程序的调用栈，从而定位问题；一旦程序崩溃，则不能再使用
   * 为什么容器需要限制CPU、内存等资源
+    
     * 如果不限制，一个程序内存飙升，可能导致整台虚拟机上的所有应用崩溃
   * k8s中的亲和度affinity
+    
     * 给不同的node打label，然后给应用的配置文件中添加亲和度（即某种label），这样k8s调度pod时，会优先部署在对应label的node上
   * 就绪指针和存活指针
     * 存活指针：该容器是否在运行
     * 就绪指针：该容器是否可以处理业务
+  * falcon-agent-sidercar
+  
+    * 每个pod中放一个falcon-agent-sidercar；每个node放一个falcon-agent；两者均监听1988端口
+  
+    * 应用向falcon-agent-sidercar应用的1988端口发出http请求，falcon-agent-sidercar处理该请求，并补充tag和Endpoint信息，发给falcon-plus
+    * 因为一个node上可能跑很多pod，这些pod有可能出现相同的应用，所以有可能监控信息被覆盖，所以需要tag区分不同的应用
+  * CI，Dockerfile，Makefile
+  
+    1. 代码推到代码仓库gitlab
+    2. `.gitlab-ci.yml`中定义了master打了tag会自动触发CI流程
+    3. 按照`.gitlab-ci.yml`定义，先进行对代码进行build，即利用Makefile生成二进制文件
+    4. 按照`.gitlab-ci.yml`定义，对二进制文件打包为镜像，利用了Dockerfile
+    5. 推到镜像仓库
+  * 服务端口
+  
+    * 容器端口由代码决定，k8s自动发现。其实代码监听某个端口，就是在那个端口建立socket连接，肯定得调用操作系统，所以操作系统是知道该端口的。
+    * 服务端口自己填
+    * 节点端口k8s自动分配
+  * iot-service
+    * 架构图：https://gitlab.dana-tech.com/pg-local/iot-service/blob/master/docs/pg_iot.md
+  * 物联云平台架构
+    * 数据节点：redis、mysql
+    * 接入节点：迪拜、俄罗斯等，设备就近接入，会部署：
+      * dana-dns(ddp)
+      * device-api：用于注册、登录、业务。平台与设备进行https交互的模块， 初步的接口设计包括：设备注册，设备登录，设备的时区、云服务等信息获取， 设备注册及登录为新增逻辑， 其他逻辑均从device-dms-api继承而来， 此功能模块完善后，即可取消device-dms-api模块， 后续可能也会将policy的逻辑加入到本模块中。（当前dms在policy的下一级，及设备链接由dns直接转到policy， 由policy到dms， device_api兼有两者的功能）
+      * conn-policy(ddp)
+      * p2p
+      * relay
+      * natcheck
+    * 设备上线流程：
+      1. 设备内预埋了dana-dns的域名和conn-policy的域名
+      2. 通过public-dns，设备知道了dana-dns域名对应的IP
+      3. 通过dana-dns，获得device-api的IP
+      4. 通过dana-dns，获得conn-policy的IP
 
 # 云计算
 
@@ -2298,6 +2424,22 @@ ALTER USER postgres WITH PASSWORD 'zhangkai';
   * 信息保存在请求方是无状态的；信息保存在响应方是无状态的。
 * Aliyun登录
   * https://signin.aliyun.com/login.htm#/main
+* nginx
+  * https://zhuanlan.zhihu.com/p/54793789
+  * 代理：仅开放一个主机ip，即可通过不同端口代理访问多个内网主机。保证了内网安全。
+
+# 云原生
+
+* [K8s中的external-traffic-policy](https://bbs.huaweicloud.com/blogs/158642)
+  * Cluster: 流量会发往其他node
+  * local：流量仅发给本node
+* [Kubernetes的三种外部访问方式：NodePort、LoadBalancer 和 Ingress](http://dockone.io/article/4884)
+  * NodePort: 所有node都开放一个端口，流量从node端口进入，经service端口转发给对应的Pod（分为Cluster和local）
+  * LoadBalance: 流量流向具有独立IP的LoadBalance，然后转向对应pod
+* 容器可以拥有自己的 **root 文件系统、自己的网络配置、自己的进程空间，甚至自己的用户 ID 空间**
+* kubesphere
+  * 一个deployment可以创建多个pod，即多个replicas
+  * 一个workspace可以创建多个project
 
 # 计算机网络
 
@@ -2877,6 +3019,18 @@ https://www.jianshu.com/p/05b4830a0010
 
     * https://juejin.cn/post/6844903965499342855
     * https://www.cnblogs.com/f-ck-need-u/p/7113610.html
+    
+49. https://github.com/wuYin/k8s-in-action
+
+50. https://cloud.tencent.com/developer/article/1004614
+
+51. 容器隧道网络
+
+52. https://github.com/shadowsocks/badvpn
+
+53. draw.io 画图工具
+
+54. 树莓派实验室
 
 
 
