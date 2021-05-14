@@ -301,6 +301,42 @@ if __name__ == "__main__":
 
 * [runtime.Caller](https://colobu.com/2018/11/03/get-function-name-in-go/)
 
+* 闭包
+
+  * https://zhuanlan.zhihu.com/p/351428978
+
+* 内嵌结构体初始化
+
+  ```go
+  type OutputCommon struct {
+  	RequestID string `json:"request_id"`
+  	Code      int64  `json:"code"`
+  	CodeMsg   string `json:"code_msg"`
+  	TraceID   string `json:"trace_id"`
+  }
+  
+  type LoginOutput struct {
+  	OutputCommon
+  	Body struct {
+  		Token string `json:"token"`
+  	} `json:"body"`
+  }
+  
+  func main() {
+  	a:=LoginOutput {
+  		OutputCommon: OutputCommon {RequestID: "good"},   //初始化内嵌结构体
+  		Body: struct {									//初始化内嵌匿名结构体
+  			Token string `json:"token"` 	//得重复匿名结构体定义，很烦
+  		}{
+  			Token: "bad",
+  		},
+  	}
+  	fmt.Println(a.RequestID)
+  }
+  ```
+
+  
+
 * go依赖包下载位置
 
   * go mod：`$GOPATH/pkg/mod`
@@ -954,9 +990,23 @@ if __name__ == "__main__":
 
   * -gt：大于
 
+* Shell反引号、$()和${}的区别
+
+  * https://cloud.tencent.com/developer/article/1398436
+  * https://blog.csdn.net/K346K346/article/details/51819236
+
 * find
 
   * 仅列出当前目录及子目录下所有文件`find . -type f`
+
+* 踩坑：
+
+  * 脚本中最好使用绝对路径，否则一定要注意工作路径和脚本所在路径可能不一致的问题。例如：
+    1. `/home/kai/try.sh`文件中有命令`find . -type f`
+    2. `/home/kai`路径下有文件`try.sh`和`kai.go`
+    3. `/home`路径下有文件`zhang.go`
+    4. 在`/home/kai`路径下执行`sh try.sh`,执行结果为`./try.sh`和`./kai.go`
+    5. 在`/home`路径下执行`sh try.sh`,执行结果为`./kai/try.sh`和`./kai/kai.go`和`./zhang.go`
 
 * sed
 
@@ -1004,6 +1054,13 @@ if __name__ == "__main__":
   * Linux通过iNode区分文件和目录
   * 软链接和被链接对象有不同的iNode
   * 硬链接和被链接对象有相同的iNode
+
+* [iptable](https://www.jianshu.com/p/ee4ee15d3658)
+
+  * `iptables [-t 表名] 命令选项 ［链名］ ［条件匹配］ ［-j 目标动作或跳转］`
+  * `iptables -t nat -A OUTPUT -p tcp -m tcp --dport 20031 -j FERRY_SIDECAR_OUTPUT`
+  * 表名包括：filter, nat, mangle, raw
+  * 链名包括：INPUT,OUTPUT,FORWARD, PREROUTING, POSTROUTING 
 
 * 查看某进程的资源占用
 
@@ -1431,6 +1488,13 @@ if __name__ == "__main__":
   nslookup www.baidu.com 8.8.8.8
   ```
 
+* dig查询dns解析过程
+
+  ```bash
+  dig +trace baidu.com
+  ```
+
+  
 
 # 操作系统
 
@@ -1936,7 +2000,11 @@ if __name__ == "__main__":
       * 自签发证书只能用于加密通信，但不能解决中间人攻击。因此，需要权威CA签发证书。
 * [OCSP](https://www.cnblogs.com/penghuster/p/6895714.html#:~:text=ocsp%EF%BC%88The%20Online%20Certificate,Status%20Protocol%EF%BC%89%E6%98%AF%E4%B8%80%E7%A7%8D%E9%AA%8C%E8%AF%81%E8%AF%81%E4%B9%A6%E7%8A%B6%E6%80%81%E7%9A%84%E4%B8%80%E7%A7%8D%E6%96%B9%E5%BC%8F%EF%BC%8C%E4%B9%9F%E6%98%AFCRL%EF%BC%88certificate%20revocation%20list%EF%BC%89%E8%AF%81%E4%B9%A6%E5%90%8A%E9%94%80%E7%9A%84%E4%B8%80%E7%A7%8D%E6%9B%BF%E4%BB%A3%E6%96%B9%E5%BC%8F%E3%80%82)
   * 用来验证证书是否过期的协议
-  * 
+* 自签证书
+  * https://gist.github.com/timest/56b68d4ae77160abae00b4bb28faf7f4
+* DH算法
+  * Alice和Bob各自拥有私钥，经协商，可以产生共享秘钥
+  * 协商过程可以被外界所知，仅私钥不能泄露
 
 # 工作
 
@@ -2416,6 +2484,14 @@ if __name__ == "__main__":
       2. 通过public-dns，设备知道了dana-dns域名对应的IP
       3. 通过dana-dns，获得device-api的IP
       4. 通过dana-dns，获得conn-policy的IP
+  * 监控
+    * 滴滴夜莺 n9e
+    * open-falcon
+  * 深圳节点的postgresql数据库必须通过nginx代理访问（将本机的对16080的访问请求代理到120.79.81.225:16090），而不能直接访问16090端口。是因为16090是ssl端口
+  * ferry-sidecar
+    * 两个作用
+      1. 代替应用进行微服务注册。需求来源：放在容器中的应用不知道自己所在node的ip和端口，所以无法将该信息注册到etcd供其他微服务调用。
+      2. 代替应用进行微服务鉴权。需求来源：token是实例级的，即，同一个应用不同的实例具有不同的token，因此，应用实例就变得有状态，即，某些rpc调用“非它不可”。ferry-sidecar代替微服务验证token（具体验证过程是，rpc调用该服务名得到其所有token，看我们要验证的token在不在其中），并将其替换为该node上应用的实际token，这样，即便这个token属于其他实例，ferry-sidecar总将其替换为本pod的真实token，应用就变得无状态，“并非非它不可”。
 
 # 云计算
 
@@ -2433,13 +2509,34 @@ if __name__ == "__main__":
 * [K8s中的external-traffic-policy](https://bbs.huaweicloud.com/blogs/158642)
   * Cluster: 流量会发往其他node
   * local：流量仅发给本node
+  
 * [Kubernetes的三种外部访问方式：NodePort、LoadBalancer 和 Ingress](http://dockone.io/article/4884)
   * NodePort: 所有node都开放一个端口，流量从node端口进入，经service端口转发给对应的Pod（分为Cluster和local）
   * LoadBalance: 流量流向具有独立IP的LoadBalance，然后转向对应pod
+  
 * 容器可以拥有自己的 **root 文件系统、自己的网络配置、自己的进程空间，甚至自己的用户 ID 空间**
+
 * kubesphere
   * 一个deployment可以创建多个pod，即多个replicas
   * 一个workspace可以创建多个project
+  
+* 键值对标签的用途
+
+  * node添加标签，pod添加selector，可以实现node亲和性调度
+  * pod添加标签，service添加selector，可以将流量转发到对应的pod
+
+* service
+
+  * service建立了容器端口和pod端口之间的映射（一般两个端口是相同的）
+
+  * service有自己虚拟ip
+  * 跑在master上
+  * 一旦service被创建，node把service name加到自己宿主机的环境变量中，供所有Pod使用
+  * 
+
+* 资料
+
+  * 网易云，需求：https://blog.csdn.net/gui951753/article/details/81543545
 
 # 计算机网络
 
@@ -2452,6 +2549,11 @@ if __name__ == "__main__":
   * 传播时延是物理层的问题，其余时延是链路层的问题
 * [URI、URL](https://zhuanlan.zhihu.com/p/56540212)
 * [http协议](https://www.cnblogs.com/ranyonsue/p/5984001.html)
+* http中的request_id
+  * 一个http请求可能涉及多个子任务，这些子任务都带有相同的request_id，这样查日志就比较方便
+  * https://blog.csdn.net/yongwan5637/article/details/90898556
+* http中的page和page_size
+  * https://crifan.github.io/http_restful_api/website/restful_experience/pagination.html
 * ip数据包在路由器之间传递，源ip和目标ip一直不变（除NAT转换外），而源MAC和目标MAC一直在变化
 * ARP协议
   * 源主机要给目标主机发消息，只知道目标的ip地址，不知道MAC地址，怎么办？
@@ -3031,6 +3133,10 @@ https://www.jianshu.com/p/05b4830a0010
 53. draw.io 画图工具
 
 54. 树莓派实验室
+
+55. 
+
+56. http://www.yidianzixun.com/article/0IX6DYAi
 
 
 
