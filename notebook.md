@@ -301,6 +301,16 @@ if __name__ == "__main__":
 
 * [runtime.Caller](https://colobu.com/2018/11/03/get-function-name-in-go/)
 
+* tensorflow有go语言的API
+
+* go语言下载包的路径
+
+  * ```go
+    import "github.com/tensorflow/tensorflow/tensorflow/go"
+    ```
+
+  * 其实是去这个URL下载包：`https://pkg.go.dev/github.com/tensorflow/tensorflow`
+
 * 闭包
 
   * https://zhuanlan.zhihu.com/p/351428978
@@ -1045,6 +1055,9 @@ if __name__ == "__main__":
   ./main
   ```
 
+  * 其实真正的库文件名是`libflatbuffers.a`和`libtensorflowlite.so`，前缀`lib`被忽略了
+  * `-I`指定头文件目录；`-L`指定库文件目录；`-l`指定库文件名
+
 * [主分区、扩展分区、逻辑分区](https://blog.csdn.net/xiexievv/article/details/50525783)
 
   只能有4个主分区，其中一个可以作为扩展分区，扩展分区可以分为多个逻辑分区
@@ -1512,6 +1525,11 @@ if __name__ == "__main__":
     * [缺点](https://segmentfault.com/a/1190000015464889)：当正在运行的用户线程发生io而阻塞时，CPU会被让出，导致该进程内的其他线程也无法使用CPU
   * 内核级线程
 * [变量名怎么存储](https://www.zhihu.com/question/34266997)
+* [指令集](https://zhuanlan.zhihu.com/p/113157931)
+    * 复杂指令集：`X86`和`-X86-64`两种架构，对应操作系统：Windows、macOS、Linux
+    * 精简指令集：`arm`架构，对应的操作系统：安卓、ios、Windows phone
+    * `X86-64`=`X64`=`AMD64`:均代表`X86`架构的64位；`X86`代表代表`X86`架构的32位
+    * 64位处理器可以装32位操作系统；32位处理器不可以装64位系统；高版本兼容低版本
 * 寄存器和高速缓存cache
     * 寄存器是CPU的一部分
     * cache
@@ -3134,27 +3152,25 @@ https://www.jianshu.com/p/05b4830a0010
 
 54. 树莓派实验室
 
-55. 
+55. https://medium.com/@seafoodholdhand/%E6%AF%94%E5%82%B3%E7%B5%B1vpn%E7%BF%BB%E7%89%86%E6%9B%B4%E5%A5%BD%E6%9B%B4%E5%BF%AB%E7%9A%84-shadowsocks-%E5%82%BB%E7%93%9C%E5%BC%8F%E6%90%AD%E5%BB%BA%E6%95%99%E7%A8%8B-24f11c3b1eb3
 
-56. http://www.yidianzixun.com/article/0IX6DYAi
+56. https://www.barretlee.com/blog/2016/08/03/shadowsocks/
 
+57. http://www.yidianzixun.com/article/0IX6DYAi
 
+58. https://www.zhihu.com/question/64860792
 
+59. https://my.oschina.net/u/4414202/blog/3364674
 
+60. ```
+    ss://aes-256-cfb:123456@139.198.115.205:50001
+    console.log( "ss://" + btoa("aes-256-cfb:123456@139.198.115.205:50001") )
+    docker run -e PASSWORD=654321 -p50000:8388 -p50000:8388/udp -d shadowsocks/shadowsocks-libev
+    ```
 
-* ```go
-  deviceNode, err := rpc.GetDeviceNodeID(deviceCode)
-  	if err != nil {
-  		logx.X.Errorm("get device node_id error", "err", err, "device_guid", deviceCode)
-  		return
-  	}
-  ```
+https://www.jianshu.com/p/f1de9f886c3e
 
-```sql
-100122172568,59289189,23745,60000,c8e154f9f0d098fa0bf41db7b42219c1,c8e154f9f0d098fa0bf41db7b42219c1,c8e154f9f0d098fa0bf41db7b42219c1,false
-c8e154f9f0d098fa0bf41db7b42219c1,100122172568,c8e154f9f0d098fa0bf41db7b42219c1,c8e154f9f0d098fa0bf41db7b42219c1,false
-
-```
+https://blog.csdn.net/K346K346/article/details/48877773
 
 
 
