@@ -5,14 +5,6 @@
 * 制造和使用工具是人的本性
 
 * ```
-  - **O: CarPlay和Google Auto 地理围栏**
-      - 描述：CarPlay和Google Auto是苹果和谷歌提供的手机向车载系统映射APP的功能，可通过车载系统直接控制车库门开关；
-             用户通过APP设置车库门地理围栏，当用户位置接近车库门位置，自动开启车库门；用户位置离开车库门，自动关闭车库门
-      - KR1：输出CarPlay和Google Auto调研报告（结合使用场景和技术实现，考虑安全、可行性、合理性）
-      - KR2：输出地理围栏调研报告（结合使用场景和技术实现，考虑安全、可行性、合理性）
-      - 预计进度：
-          - KR1: 2021-05-17/2021-05-21 100%
-          - KR2: 2021-05-24/2021-05-28 100%
           
           active_consumer、active_device、active_device_info、bind、consumer、form、form_device_views、manufacture_device、new_device、share、subscribe、
   ```
@@ -20,6 +12,8 @@
 # Python
 
 * 从一个文件夹中逐个读取文件名：
+
+* 
 
   ```python
   for imgname in os.listdir(imgdir):
@@ -981,6 +975,34 @@ if __name__ == "__main__":
   
     预期输出为20000000000。可见，并发冲突很严重
 
+# Java
+
+* 数据类型
+
+  * Map
+
+    ```java
+    Map<Integer, Object> outputMap = new HashMap<>();
+    ```
+
+    
+
+  * ArrayList
+
+    ```java
+    ArrayList<Recognition> recognitions = new ArrayList<>(numDetectionsOutput);
+    ```
+
+    
+
+  * List
+
+    ```java
+    private final List<String> labels = new ArrayList<>();
+    ```
+
+    
+
 # Shell
 
 * ```bash
@@ -1067,6 +1089,11 @@ if __name__ == "__main__":
   * Linux通过iNode区分文件和目录
   * 软链接和被链接对象有不同的iNode
   * 硬链接和被链接对象有相同的iNode
+
+* ldd
+
+  * 依赖分析工具
+  * https://blog.csdn.net/tf_apologize/article/details/104131254
 
 * [iptable](https://www.jianshu.com/p/ee4ee15d3658)
 
@@ -1221,6 +1248,10 @@ if __name__ == "__main__":
 
   * typora在绘制很长的表格时，可配合wps进行操作
 
+* [jetbrains mono编程字体下载](https://www.jetbrains.com/lp/mono/#support-languages)
+
+  * https://blog.csdn.net/qq_31061615/article/details/104751496
+
 * [typora画图](https://zhuanlan.zhihu.com/p/172635547)
 
   * https://www.cnblogs.com/codeclock/p/13634272.html
@@ -1230,6 +1261,16 @@ if __name__ == "__main__":
 * [python的C与C++扩展编程:Cython和pybind11](https://zhuanlan.zhihu.com/p/49737946)
 
 * [datagrip使用指南](https://www.jb51.net/softjc/666676.html)
+
+* goland
+
+  * `shift+alt+左`，回退页面
+
+* vscode
+
+  * 进入/退出全屏:`F11`
+  * 切换主题（背景颜色、代码高亮）：`Ctrl+K, Ctrl+T`
+  * 使用`Darcula theme`插件
 
 * [markdown画图](https://mermaid-js.github.io/mermaid/#/)
 
@@ -1380,6 +1421,8 @@ if __name__ == "__main__":
   * `grep -E "good|bad|" example.txt`good或者bad
   * `grep "^g"`开头是g
   * `-i`忽略大小写；`-n`显示行号；`-v`反向查找
+  
+* [wechat](https://appdb.winehq.org/objectManager.php?sClass=version&iId=37758)
 
 # 指令
 
@@ -1410,6 +1453,10 @@ if __name__ == "__main__":
 
 
 * 退出git编辑器：摁住ESP，快速摁ZZ两
+
+* cenos下安装`g++`
+
+  * `yum install gcc-c++`
 
 * 设置主机名
 
@@ -1525,6 +1572,7 @@ if __name__ == "__main__":
     * [缺点](https://segmentfault.com/a/1190000015464889)：当正在运行的用户线程发生io而阻塞时，CPU会被让出，导致该进程内的其他线程也无法使用CPU
   * 内核级线程
 * [变量名怎么存储](https://www.zhihu.com/question/34266997)
+* [编程语言的可移植性](https://www.cnblogs.com/Braveliu/p/6109057.html)
 * [指令集](https://zhuanlan.zhihu.com/p/113157931)
     * 复杂指令集：`X86`和`-X86-64`两种架构，对应操作系统：Windows、macOS、Linux
     * 精简指令集：`arm`架构，对应的操作系统：安卓、ios、Windows phone
@@ -1551,6 +1599,10 @@ if __name__ == "__main__":
 * timescaledb
 
   * http://www.pgsql.tech/project_303_10000020
+
+* redis
+
+  * https://zhuanlan.zhihu.com/p/78034665
 
 * postgresql
 
@@ -2023,6 +2075,8 @@ if __name__ == "__main__":
 * DH算法
   * Alice和Bob各自拥有私钥，经协商，可以产生共享秘钥
   * 协商过程可以被外界所知，仅私钥不能泄露
+* JWT(JSON WEB TOKEN)
+  * https://www.jianshu.com/p/576dbf44b2ae
 
 # 工作
 
@@ -2455,7 +2509,7 @@ if __name__ == "__main__":
     * 非常大的日志文件进行全量搜索非常慢，而阿里云的日志服务可以查的很快，支持SQL搜索等
 * etcd用于服务注册与发现
     * 服务注册：应用A将ip、端口、token（此应用自己生成的）注册到etcd
-  * 服务发现：应用B从etcd订阅得到应用A的ip、端口、token，然后拿着这些东西直接去调应用A，应用A会对token进行验证
+    * 服务发现：应用B从etcd订阅得到应用A的ip、端口、token，然后拿着这些东西直接去调应用A，应用A会对token进行验证
   * falcon-agent和pprof的区别
   * falcon-agent在代码中可以调用bmon等package；将程序运行状态发送到运行在虚拟机的应用falcon-agent，然后发送给中心节点，然后配置告警规则等
     * pprof在代码中可以调用pprof等package；在代码运行时，可以通过ip、端口打开浏览器，观察到应用占用的CPU、内存等，如果发现内存占用率过高，可以查看程序的调用栈，从而定位问题；一旦程序崩溃，则不能再使用
@@ -2488,20 +2542,45 @@ if __name__ == "__main__":
     * 节点端口k8s自动分配
   * iot-service
     * 架构图：https://gitlab.dana-tech.com/pg-local/iot-service/blob/master/docs/pg_iot.md
+  * 业务埋点和程序日志
+  
+    * 都是为了定位问题或者获得程序执行过程中的信息
+    * 业务埋点针对性更强，只针对感兴趣的业务问题
+  
+    * 业务埋点：大都在设备侧，平台侧很少；通过http report；上报内容包括：从用户点击播放实时视频，到收到视频第一帧所花费的时间；发送到pecker，供分析使用
+    * 程序日志：通过`logx.X.infom`等；可能仅保存15天
+  * device shadow
+  
+    * 设备影子：存储了设备属性，放在云端；设备和设备影子需要及时同步
+    * 需求来源：对于低功耗设备，每一次查询设备都需要唤醒设备，产生耗电，因此在云端需要设备影子，这样不需要频繁唤醒设备
   * 物联云平台架构
     * 数据节点：redis、mysql
+    
     * 接入节点：迪拜、俄罗斯等，设备就近接入，会部署：
       * dana-dns(ddp)
       * device-api：用于注册、登录、业务。平台与设备进行https交互的模块， 初步的接口设计包括：设备注册，设备登录，设备的时区、云服务等信息获取， 设备注册及登录为新增逻辑， 其他逻辑均从device-dms-api继承而来， 此功能模块完善后，即可取消device-dms-api模块， 后续可能也会将policy的逻辑加入到本模块中。（当前dms在policy的下一级，及设备链接由dns直接转到policy， 由policy到dms， device_api兼有两者的功能）
       * conn-policy(ddp)
+        * 似乎跟router-policy是一回事，功能之一是分配用户节点，如绑定一个门铃，分配用户节点为32，但似乎不等于数据节点
       * p2p
       * relay
       * natcheck
+      
     * 设备上线流程：
       1. 设备内预埋了dana-dns的域名和conn-policy的域名
       2. 通过public-dns，设备知道了dana-dns域名对应的IP
       3. 通过dana-dns，获得device-api的IP
       4. 通过dana-dns，获得conn-policy的IP
+      
+    * 为什么需要接入节点?
+    
+      * 就近接入，速度快
+      * 隐私政策，不能把俄罗斯的数据发到欧洲
+    * 接入节点用户少，因此需要“接入节点”而不是“数据节点”
+  * faceR有不同的类型，通过配置文件的不同，来区分不同类型，如类型一向etcd注册faceR1 service，类型二向etcd注册faceR2 service。不同的类型可以设置多个副本
+  * face detection有8个副本，每个副本放在一个64核的机器上，通过负载均衡器对外提供服务。
+  * udh-api目前功能比较复杂，应当分离出网关功能和业务功能；udh-service用来查数据库
+  * snap和clips根据产品型号，由芯片提供。如人形消息，会产生一张snap和一个clips，先存hbase。然后此snap会触发人脸检测，如果检测到人脸，则增加一条人脸消息索引。特殊地，由于门铃的特殊性，人会从门铃侧面转到门铃正面，设置了特殊逻辑，即每2s拍一张snap，因此门铃会有多个snap和一个clips，对于一条人形消息而言。
+    * 对于每一种消息，如婴儿哭声、人形消息、人脸消息，snap作为该消息的缩略图，点击该缩略图，会播放对应的clips。因此snap并非完全无用。
   * 监控
     * 滴滴夜莺 n9e
     * open-falcon
@@ -2514,13 +2593,26 @@ if __name__ == "__main__":
 # 云计算
 
 * [中间件](http://c.biancheng.net/view/3860.html)
+
 * [有状态服务和无状态服务](https://zhuanlan.zhihu.com/p/65762125)
   * 信息保存在请求方是无状态的；信息保存在响应方是无状态的。
+  
 * Aliyun登录
   * https://signin.aliyun.com/login.htm#/main
+  
 * nginx
   * https://zhuanlan.zhihu.com/p/54793789
   * 代理：仅开放一个主机ip，即可通过不同端口代理访问多个内网主机。保证了内网安全。
+  
+* API网关
+
+  * API 网关是 API 管理系统的一部分。API 网关会拦截所有传入的请求，然后通过 API 管理系统（该系统负责处理各种必要的功能）将其发送出去。
+
+    API 网关的工作因实施不同而异。一些常见的功能包括：身份验证、路由、速率限制、计费、监控、分析、策略、警报和安全防护。
+    
+  * 管控，多渠道统一安全接入
+  
+  * 当云端业务发生变化时，可能只需要修改该API接口所指向的实例，而端侧不需要改动，仍然调用原来的那个接口
 
 # 云原生
 
@@ -2555,6 +2647,8 @@ if __name__ == "__main__":
 * 资料
 
   * 网易云，需求：https://blog.csdn.net/gui951753/article/details/81543545
+  
+  
 
 # 计算机网络
 
@@ -2769,7 +2863,7 @@ if __name__ == "__main__":
 
     
 
-* 安装ncnn过程中不知道什么鬼东西
+* 安装ncnn过程中不知道什么鬼东西（似乎是TPU加速）
 
   ```bash
   $ wget https://sdk.lunarg.com/sdk/download/1.2.154.0/linux/vulkansdk-linux-x86_64-1.2.154.0.tar.gz?Human=true -O vulkansdk-linux-x86_64-1.2.154.0.tar.gz
@@ -2829,6 +2923,8 @@ if __name__ == "__main__":
   python3 -m onnxsim net.onnx net_sim.onnx
   ```
 
+* [模型可视化工具netron](https://lutzroeder.github.io/netron/)
+
 * onnx转ncnn(两种方法）
 
   * [一键转换工具](https://convertmodel.com/)
@@ -2839,7 +2935,293 @@ if __name__ == "__main__":
     ./onnx2ncnn net_sim.onnx
     ```
 
+* 人脸检测Android的demo
+  * 模型选择`Ultra-Light-Fast-Generic-Face-Detector-1MB`，图片输入`320*240`
 
+  * 工具：https://developers.google.com/ml-kit/vision/face-detection/android#java
+
+  * 难点
+
+    * 图片预处理：均值、方差、size大小、RGB通道
+    * 模型输出结果处理：方框、置信度、label
+
+  * 未知
+
+    * 帧处理和图片转换
+    * 模型量化，数据也要量化（数据量化不需要减均值，除以方差）
+
+  * 步骤：
+    1. 从摄像头获取图片
+    2. 图片预处理
+       1. resize
+       2. BGR2RGB
+       3. 均值、方差处理
+    3. 构造人脸检测器
+    4. 将预处理图片传入人脸检测器
+    5. 人脸检测器invoke，拿到模型输出
+    6. 图片后处理
+       1. bounding box regression
+       2. confidence threshold filter
+       3. non-maximum suppression
+    7. 得到score和box
+    
+  * 任务分解
+
+    - [x] 跑通原demo
+  
+    - [x] 修改build.gradle默认API，从`lib_task_api`改为`lib_interpreter`
+  
+      * 前者专门用于对象检测，抽象程度更高
+      * 后者用`interpreter`实现，当我们用自己的模型时，可以充分进行修改
+  
+      ```bash
+      //build.gradle  
+        flavorDimensions "tfliteInference"
+        productFlavors {
+             // The TFLite inference is built using the TFLite Java interpreter.
+             interpreter {
+                 getIsDefault().set(true)			//增加此行
+                 dimension "tfliteInference"
+             }
+             // Default: The TFLite inference is built using the TFLite Task library (high-level API).
+             taskApi {
+      //           getIsDefault().set(true)		//注释此行
+                 dimension "tfliteInference"
+             }
+          }
+      或者
+          flavorDimensions "tfliteInference"
+          productFlavors {
+             // The TFLite inference is built using the TFLite Java interpreter.
+             interpreter {
+      //           getIsDefault().set(true)
+                 dimension "tfliteInference"
+             }
+             // Default: The TFLite inference is built using the TFLite Task library (high-level API).
+      //       taskApi {
+      ////           getIsDefault().set(true)
+      //           dimension "tfliteInference"
+      //       }
+          }
+          
+      //settings.gradle
+      include ':app', ':lib_interpreter', ':lib_task_api'
+      改为
+      include ':app', ':lib_interpreter'
+      
+      //build.gradle(app)
+      注释掉dependencies中的 taskApiImplementation project(":lib_task_api")
+      ```
+      
+      
+  
+    * [ ] 跑模型python脚本
+    * [ ] 模型输入需要`320*240`还是`240*320`
+    * [ ] 了解安卓开发的基础知识：例如，那么多gradle是干啥的；build之后项目结构都变了；没有main函数，整个项目怎么组织起来
+  
+  * 原模型
+  
+    * 输入
+      * https://tfhub.dev/tensorflow/lite-model/ssd_mobilenet_v1/1/metadata/2
+      * 均值：127.5；方差：127.5
+      * `1*300*300*3`
+    * 输出
+      * location、category、score、number of detections
+  
+  * ULTRA模型
+  
+    * 输入
+  
+      * ```
+        fd = UltraLightFaceDetecion(model_path,
+                                    input_size=(320, 240), conf_threshold=0.6,
+                                    center_variance=0.1, size_variance=0.2,
+                                    nms_max_output_size=200, nms_iou_threshold=0.3)
+        //https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB/tree/master/tflite                    
+        ```
+  
+      * 宽：320，高：240
+  
+      * 置信度阈值：0.6
+  
+      * nms_iou_threshold_ = 0.3
+  
+      * img_resize = cv2.cvtColor(img_resize, cv2.COLOR_BGR2RGB) https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB/blob/master/tf/det_image.py 
+  
+      * ```bash
+        #非常确定要做这样的预处理
+        img_resize = img_resize - 127.0
+            img_resize = img_resize / 128.0
+        ```
+  
+      * preprocess顺序
+  
+        1. BGR2RGB
+        2. resize
+        3. mean_normalize
+        4. 展成一维`1*240*320*3`
+  
+    * 输出
+  
+      * https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB/blob/master/ncnn/src/main.cpp
+      
+      * score，location
+      
+        * score:`score[0][][1]`:第一维表示图片，由于我们每次处理一张图片，所以第一维是0；第二维表示有几个框对应的分数；第三维看了python和c++代码实现都是选1，不知道为啥
+      
+        * location:`location[0][][]`：第一维表示图片，由于我们每次处理一张图片，所以第一维是0；第二维表示有几个框；第三维表示框位置
+      
+      * https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB/blob/master/tf/det_image.py
+      
+      * 输出多个框，遍历每一个框 \# result=[background,face,x1,y1,x2,y2]
+      
+      * Python处理tflite模型步骤
+      
+        1. 取出score和boxes
+      
+           ```python
+           #index是python api提供的数据结构，如下所示：
+           # details = {
+           #         'name': tensor_name,
+           #         'index': tensor_index,
+           #         'shape': tensor_size,
+           #         'shape_signature': tensor_size_signature,
+           #         'dtype': tensor_type,
+           #         'quantization': tensor_quantization,
+           #         'quantization_parameters': {
+           #             'scales': tensor_quantization_params[0],
+           #             'zero_points': tensor_quantization_params[1],
+           #             'quantized_dimension': tensor_quantization_params[2],
+           #         },
+           #         'sparsity_parameters': tensor_sparsity_params
+           #     }
+           self._get_boxes_tensor = partial(self._interpreter.get_tensor,
+                                                    output_details[0]["index"])
+           self._get_scores_tensor = partial(self._interpreter.get_tensor,
+                                                     output_details[1]["index"])
+               
+               # get results
+               boxes = self._get_boxes_tensor()[0]
+               scores = self._get_scores_tensor()[0]
+           ```
+        
+        2. bounding box regression
+        
+        3. confidence threshold filter
+        
+        4. non-maximum suppression
+  
+  * 未解之谜
+  
+    * [ ] settings.gradle是怎样决定lib_task_api是否被编译的
+    * [ ] 一个模型训练好以后，它的输入图片大小是确定的，还是任意的，还是可以在模型转换过程中被修改
+    * [x] Java中的extends和implements
+      * extends：继承
+      * implements：实现接口
+  
+  * 查到的小知识
+  
+    * cv::Scalar(0, 255, 0)表示蓝色框 // a = blue, b = green, c = red表示RGB三个通道
+  
+    * 图片宽高表示
+  
+      * ```python
+        h, w, _ = img.shape  # 高，宽
+        img_resize = cv2.resize(img, (320, 240))  #宽，高
+        ```
+  
+    * nms非极大值抑制
+  
+      * https://www.cnblogs.com/makefile/p/nms.html
+      
+    * cv2.resize
+  
+      * https://blog.csdn.net/jningwei/article/details/76019940
+  
+    * cv2.retangle
+  
+      * https://www.jianshu.com/p/0fb7a1077a68
+  
+    * bounding box
+  
+      * https://blog.csdn.net/zijin0802034/article/details/77685438
+  
+  * 可能产生bug的地方
+  
+    * 图片输入的宽和高
+    * 用Java拿到模型输出的方式
+  
+  * 踩坑记录
+  
+    * [Android Studio报：Connection timed out: connect. If you are behind an HTTP proxy错误](https://blog.csdn.net/Ryanymk/article/details/116542100)
+  
+    * [开启开发者模式和USB调试](https://developer.android.com/studio/run/device)
+  
+    * tensorflow模型输出的检测框代表什么
+  
+      * 图片坐标原点在左上角
+      * 图片大小表述：100 x 200 pixels (height x width)，注意是`高*宽`
+      * **`bbox`**: tf.Tensor of type [`tf.float32`](https://www.tensorflow.org/api_docs/python/tf#float32) and shape `[4,]` which contains the normalized coordinates of the bounding box `[ymin, xmin, ymax, xmax]`
+      * 参考资料
+  
+        * https://www.tensorflow.org/api_docs/python/tf/image/draw_bounding_boxes
+      * https://www.tensorflow.org/datasets/api_docs/python/tfds/features/BBoxFeature
+      
+    * g++
+    
+      * `-I`只会搜索当前目录下的头文件，不会搜索子目录
+      * `-L`指定库文件路径
+      * `-l`指定库文件，如果库文件直接互相依赖，则被依赖项应放在后边
+    
+    * generate anchor
+    
+      ```python
+      import numpy as np
+      feature_maps = np.array([[40, 30], [20, 15], [10, 8], [5, 4]])
+      min_boxes = np.array([[10, 16, 24], [32, 48],
+                                          [64, 96], [128, 192, 256]])
+      input_size = np.array((320, 240))[:, None]
+      anchors = []
+      for feature_map_w_h, min_box in zip(feature_maps, min_boxes):
+          print('************************************')
+          print(feature_map_w_h, min_box)
+      
+          wh_grid = min_box / input_size
+          print(wh_grid)
+          wh_grid = np.tile(wh_grid.T, (np.prod(feature_map_w_h), 1))
+          print(wh_grid)
+      
+          xy_grid = np.meshgrid(range(feature_map_w_h[0]),
+                                range(feature_map_w_h[1]))
+          print(1, xy_grid)
+          xy_grid = np.add(xy_grid, 0.5)
+          print(2, xy_grid.shape)
+          print(xy_grid)
+          xy_grid /= feature_map_w_h[..., None, None]
+          print(3, xy_grid.shape)
+          print(xy_grid)
+          xy_grid = np.stack(xy_grid, axis=-1)
+          print(4, xy_grid.shape)
+          print(xy_grid)
+          xy_grid = np.tile(xy_grid, [1, 1, len(min_box)])
+          print(5, xy_grid.shape)
+          print(xy_grid)
+          xy_grid = xy_grid.reshape(-1, 2)
+          print(6, xy_grid.shape)
+          print(xy_grid)
+      
+      
+          prior = np.concatenate((xy_grid, wh_grid), axis=-1)
+          anchors.append(prior)
+      
+      anchors = np.concatenate(anchors, axis=0)
+      anchors = np.clip(anchors, 0.0, 1.0)
+      ```
+  
+* NCNN库
+
+  * 预构建好的：https://github.com/Tencent/ncnn/releases
+  * 从源码交叉编译：https://github.com/Tencent/ncnn/wiki/how-to-build#build-for-android
 
 # 临时记录
 
@@ -3172,5 +3554,18 @@ https://www.jianshu.com/p/f1de9f886c3e
 
 https://blog.csdn.net/K346K346/article/details/48877773
 
+https://zhuanlan.zhihu.com/p/48992451
 
+https://www.cnblogs.com/shine-lee/p/10115582.html
 
+https://segmentfault.com/q/1010000002982186
+
+https://www.cnblogs.com/stemon/p/4000468.html
+
+https://cloud.tencent.com/developer/article/1757861
+
+https://aijishu.com/a/1060000000100813
+
+https://zhuanlan.zhihu.com/p/55824651
+
+https://cloud.tencent.com/developer/article/1666793
